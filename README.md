@@ -7,6 +7,8 @@
 - See [smallworld.love/main.lua](smallworld.love/main.lua)
   - barebones example [modules/barebones.lua](smallworld.love/modules/barebones.lua)
 
+- **To switch to the ECS helloworld demo**, edit main.lua and uncomment out the proper RootModule line.
+
 ### Running on OS X
 
 - See the [Love2d Getting Started docs](https://love2d.org/wiki/Getting_Started) and make s

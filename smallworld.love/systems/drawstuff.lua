@@ -2,6 +2,16 @@
 local DBG=false
 local BOUNDS=false
 
+-- This is a prototype "output" system.
+--
+-- Currently it's a catch-all for drawing all the things.
+-- Unfortunately it's not yet extensible without just editing the big case statement
+-- below.  The estore:walkEntities call below traverses entities in such
+-- a way to enforce ordering of draws amongst peers. (See the 'parent' component type's 'order' property.)
+--
+-- (NOTE: if you don't want to directly manage relative sibling ordering,
+-- siblings are ordered according to order of being added to their parent.)
+
 return function(estore,_input_,res) -- _input_ is just to match the pattern of systems, we don't use it
   local drawBounds = false
   estore:walkEntities(hasComps('tag','debug'), function(e)
