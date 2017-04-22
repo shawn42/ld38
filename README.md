@@ -4,7 +4,8 @@
 2. Recommend bash alias: `alias love='/Applications/love.app/Contents/MacOS/love'`
 3. Launch: `love smallworld.love`
 
-See [smallworld.love/main.lua](smallworld.love/main.lua)
+- See [smallworld.love/main.lua](smallworld.love/main.lua)
+  - barebones example [modules/barebones.lua](smallworld.love/modules/barebones.lua)
 
 ### Running on OS X
 
