@@ -24,8 +24,8 @@ require 'helpers'
 -- and execute them only when the "tick" action arrives, and clear those internal buffers.
 --
 -- The root of the module hierarchy:
--- local RootModule = require 'modules/rpg/uimodule'
 local RootModule = require 'modules/barebones'
+-- local RootModule = require 'modules/ecsdemo'
 
 -- Reference to the root module state
 local world
