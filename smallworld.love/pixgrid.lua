@@ -26,10 +26,12 @@ function Pixgrid:set(x,y,r,g,b,type)
   -- local pix = self.buf[1 + (y*self.w + x)]
   local i = 1+((y * self.w) + x)
   local pix = self.buf[i]
-  pix[3] = r
-  pix[4] = g
-  pix[5] = b
-  pix.type = type
+  if pix then
+    pix[3] = r
+    pix[4] = g
+    pix[5] = b
+    pix.type = type
+  end
 end
 
 function Pixgrid:clear(x,y)

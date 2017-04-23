@@ -16,6 +16,7 @@ M.newWorld = function(opts)
       color = {0,0,0},
       x = 0,
       y = 0,
+      brushSize = 10,
     }
   }
 
@@ -37,7 +38,11 @@ M.updateWorld = function(world, action)
 
     local painter = world.painter
     if painter.on then
-      world.pixgrid:set(painter.x, painter.y, painter.color[1], painter.color[2], painter.color[3], painter.type)
+      for i=1,painter.brushSize do
+        local x = painter.x + love.math.random(-painter.brushSize, painter.brushSize)
+        local y = painter.y + love.math.random(-painter.brushSize, painter.brushSize)
+        world.pixgrid:set(x, y, painter.color[1], painter.color[2], painter.color[3], painter.type)
+      end
     end
 
     automateTheCellular(world.pixgrid)
@@ -73,11 +78,24 @@ function automateTheCellular(pixgrid)
   for i=1,#pixgrid.buf do
     local p = pixgrid.buf[i]
     if p.type == T.Leaf then
+      local above = pixgrid:get(p[1],p[2]-1)
       local below = pixgrid:get(p[1],p[2]+1)
       if below and below.type == T.Off then
         -- move me down
         table.insert(clears, p) -- clear my current cell
         table.insert(sets, {below[1], below[2], p[3],p[4],p[5], p.type})
+      elseif above and above.type ~= T.Off then
+        local left = pixgrid:get(p[1]-1,p[2])
+        local right = pixgrid:get(p[1]+1,p[2])
+
+        local goLeft = love.math.random(0,1) == 1
+        if goLeft and left and left.type == T.Off then
+          table.insert(clears, p)
+          table.insert(sets, {left[1], left[2], p[3],p[4],p[5], p.type})
+        elseif right and right.type == T.Off then
+          table.insert(clears, p)
+          table.insert(sets, {right[1], right[2], p[3],p[4],p[5], p.type})
+        end
       end
     end
   end
