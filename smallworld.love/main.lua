@@ -24,15 +24,19 @@ require 'helpers'
 -- and execute them only when the "tick" action arrives, and clear those internal buffers.
 --
 -- The root of the module hierarchy:
-local RootModule = require 'modules/barebones'
--- local RootModule = require 'modules/ecsdemo'
+-- local RootModule = require 'modules/rpg/uimodule'
+-- local RootModule = require 'modules/barebones'
+local RootModule = require 'modules/pixels'
 
 -- Reference to the root module state
 local world
 
 function love.load()
-  love.window.setMode(1024,768)
-  world = RootModule.newWorld()
+  -- love.window.setMode(1024,768)
+  love.window.setMode(800,600)
+  world = RootModule.newWorld({
+    bounds={x=0,y=0,w=800,h=600}
+  })
 end
 
 local dtAction = {type="tick", dt=0}
