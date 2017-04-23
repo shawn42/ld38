@@ -7,9 +7,14 @@ local automateTheCellular
 
 M.newWorld = function(opts)
   local world = {
+    timectrl = {
+      interval = 1,  -- how often (in ticks, not time) to actually perform the update
+      tickcounter = 0,
+      stepwise = false,
+      stepped = false,
+    },
     bounds = opts.bounds,
     bgcolor = {0,0,0},
-    t = 0,
     painter = {
       on = false,
       type = T.Off,
@@ -34,19 +39,36 @@ end
 
 M.updateWorld = function(world, action)
   if action.type == "tick" then
-    -- world.t = world.t + action.dt
-
-    local painter = world.painter
-    if painter.on then
-      for i=1,painter.brushSize do
-        local x = painter.x + love.math.random(-painter.brushSize, painter.brushSize)
-        local y = painter.y + love.math.random(-painter.brushSize, painter.brushSize)
-        world.pixgrid:set(x, y, painter.color[1], painter.color[2], painter.color[3], painter.type)
+    -- Use timectrl to decide if we should update this tick or not:
+    local tc = world.timectrl
+    local doUpdate = false
+    if tc.stepwise then
+      -- User must kick the simulation along by hitting a key
+      if tc.stepped then
+        doUpdate = true
+        tc.stepped = false
+      end
+    else
+      -- Rate-controlled:
+      tc.tickcounter = tc.tickcounter + 1
+      if tc.tickcounter >= tc.interval then -- in ticks, not time
+        tc.tickcounter = 0
+        doUpdate = true
       end
     end
 
-    automateTheCellular(world.pixgrid)
+    if doUpdate then
+      local painter = world.painter
+      if painter.on then
+        for i=1,painter.brushSize do
+          local x = painter.x + love.math.random(-painter.brushSize, painter.brushSize)
+          local y = painter.y + love.math.random(-painter.brushSize, painter.brushSize)
+          world.pixgrid:set(x, y, painter.color[1], painter.color[2], painter.color[3], painter.type)
+        end
+      end
 
+      automateTheCellular(world.pixgrid)
+    end
 
   elseif action.type == 'mouse' then
     local s = world.pixgrid.scale
@@ -61,6 +83,15 @@ M.updateWorld = function(world, action)
     elseif action.state == 'moved' then
       world.painter.x = math.floor(action.x/s)
       world.painter.y = math.floor(action.y/s)
+    end
+
+  elseif action.type == 'keyboard' then
+    if action.state == 'pressed' then
+      if action.key == 's' then
+        world.timectrl.stepwise = not world.timectrl.stepwise
+      elseif action.key == 'space' then
+        world.timectrl.stepped = true
+      end
     end
   end
   return world, nil
