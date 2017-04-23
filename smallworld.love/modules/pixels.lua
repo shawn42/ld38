@@ -20,11 +20,11 @@ M.newWorld = function(opts)
     }
   }
 
-  local pscale = 1
+  local scale = opts.scale or 1
   world.pixgrid = Pixgrid({
-    w=world.bounds.w/pscale,
-    h=world.bounds.h/pscale,
-    scale=pscale,
+    w=world.bounds.w/scale,
+    h=world.bounds.h/scale,
+    scale=scale,
   })
 
   world.pixgrid:set(100,400, 150,255,150, T.Leaf)
@@ -49,17 +49,18 @@ M.updateWorld = function(world, action)
 
 
   elseif action.type == 'mouse' then
+    local s = world.pixgrid.scale
     if action.state == 'pressed' then
       world.painter.on = true
       world.painter.type = T.Leaf
       world.painter.color = {150,255,150}
-      world.painter.x = action.x
-      world.painter.y = action.y
+      world.painter.x = math.floor(action.x/s)
+      world.painter.y = math.floor(action.y/s)
     elseif action.state == 'released' then
       world.painter.on = false
     elseif action.state == 'moved' then
-      world.painter.x = action.x
-      world.painter.y = action.y
+      world.painter.x = math.floor(action.x/s)
+      world.painter.y = math.floor(action.y/s)
     end
   end
   return world, nil
@@ -67,7 +68,9 @@ end
 
 M.drawWorld = function(world)
   love.graphics.setBackgroundColor(unpack(world.bgcolor))
-  love.graphics.setPointSize(world.pixgrid.scale)
+  local s = world.pixgrid.scale
+  love.graphics.setPointSize(s)
+  love.graphics.scale(s,s)
   love.graphics.points(world.pixgrid.buf)
 end
 

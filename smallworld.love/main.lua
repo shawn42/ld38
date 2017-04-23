@@ -35,7 +35,8 @@ function love.load()
   -- love.window.setMode(1024,768)
   love.window.setMode(800,600)
   world = RootModule.newWorld({
-    bounds={x=0,y=0,w=800,h=600}
+    bounds={x=0,y=0,w=800,h=600}, -- unscaled pixel size
+    scale=5,                      -- apparent pixel size on screen
   })
 end
 

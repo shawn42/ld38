@@ -23,9 +23,7 @@ function Pixgrid:init(opts)
 end
 
 function Pixgrid:set(x,y,r,g,b,type)
-  -- local pix = self.buf[1 + (y*self.w + x)]
-  local i = 1+((y * self.w) + x)
-  local pix = self.buf[i]
+  local pix = self.buf[1 + ((y * self.w) + x)]
   if pix then
     pix[3] = r
     pix[4] = g
