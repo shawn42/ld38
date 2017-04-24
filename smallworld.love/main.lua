@@ -1,42 +1,21 @@
 require 'helpers'
 
--- This is the main in-point for the love2d game.
+local WIDTH = 800
+local HEIGHT = 600
+local SCALE = 2
+local ITERATIONS = 2
 
--- The point of this file is to bind some "Module" to
--- love2d's incoming events
-
--- The Modules don't contain their own state, they instead create
--- an initial state and accept that state in updateWorld and drawWorld.
---
--- Modules are expected to export 3 functions:
---   world = newWorld()
---   updateWorld(world, action)
---   drawWorld(world)
--- Main knows nothing about the structure of 'world'.
--- Main _does_ share an understanding of any action structure that
--- it may pass into the module.  See default structures for
--- dtAction, keyboardAction etc. Below.
--- These types are part of a contract between this outer main and the root module.
--- Feel free to rewrite that contract.
---
--- NOTE: updateWorld may be called for more reasons than game time ticks.
--- It is normal for modules to internally accumulate input actions in a buffer
--- and execute them only when the "tick" action arrives, and clear those internal buffers.
---
--- The root of the module hierarchy:
--- local RootModule = require 'modules/rpg/uimodule'
--- local RootModule = require 'modules/barebones'
 local RootModule = require 'modules/pixels'
 
 -- Reference to the root module state
 local world
 
 function love.load()
-  -- love.window.setMode(1024,768)
-  love.window.setMode(800,600)
+  love.window.setMode(WIDTH,HEIGHT)
   world = RootModule.newWorld({
-    bounds={x=0,y=0,w=800,h=600}, -- unscaled pixel size
-    -- scale=5,                      -- apparent pixel size on screen
+    bounds={x=0,y=0,w=WIDTH,h=HEIGHT}, -- unscaled pixel size
+    scale=SCALE,              -- apparent pixel size on screen
+    iterations=ITERATIONS,
   })
 end
 

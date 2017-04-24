@@ -10,6 +10,7 @@ local automateTheCellular, prepoluatePixgrid
 
 M.newWorld = function(opts)
   local world = {
+    iterations=opts.iterations,
     timectrl = {
       interval = 1,  -- how often (in ticks, not time) to actually perform the update
       tickcounter = 0,
@@ -34,7 +35,7 @@ M.newWorld = function(opts)
     },
   }
 
-  local scale = opts.scale or 2
+  local scale = opts.scale or 1
   world.pixgrid = Pixgrid({
     w=world.bounds.w/scale,
     h=world.bounds.h/scale,
@@ -85,8 +86,7 @@ M.updateWorld = function(world, action)
           end
         end
       end
-      local cellSteps = 2
-      for i=1,cellSteps do
+      for i=1,world.iterations do
         automateTheCellular(world.pixgrid)
       end
     end
@@ -150,7 +150,7 @@ M.drawWorld = function(world)
   love.graphics.setPointSize(s)
   love.graphics.scale(s,s)
   love.graphics.points(world.pixgrid.buf)
-  love.graphics.print("Current FPS: "..tostring(love.timer.getFPS( )), 10, 10)
+  -- love.graphics.print("Current FPS: "..tostring(love.timer.getFPS( )), 10, 10)
 end
 
 
