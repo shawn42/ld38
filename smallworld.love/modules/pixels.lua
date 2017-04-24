@@ -34,7 +34,7 @@ M.newWorld = function(opts)
     },
   }
 
-  local scale = opts.scale or 1
+  local scale = opts.scale or 2
   world.pixgrid = Pixgrid({
     w=world.bounds.w/scale,
     h=world.bounds.h/scale,
