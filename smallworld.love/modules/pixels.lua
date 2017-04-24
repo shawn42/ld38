@@ -6,7 +6,7 @@ local Pixtypes = require 'pixtypes'
 local T = Pixtypes.Type
 local Color = Pixtypes.Color
 
-local automateTheCellular
+local automateTheCellular, prepoluatePixgrid
 
 M.newWorld = function(opts)
   local world = {
@@ -41,8 +41,7 @@ M.newWorld = function(opts)
     scale=scale,
   })
 
-  local c = Color.Sand
-  world.pixgrid:set(100,400, c[1], c[2], c[3], T.Sand)
+  prepoluatePixgrid(world.pixgrid)
 
   return world
 end
@@ -223,6 +222,23 @@ function automateTheCellular(pixgrid)
     end
   end
 
+end
+
+
+local function addSandDunes(pixgrid, freq, amp, topEdge)
+  local top, y
+  local c = Color.Sand
+  local bar = topEdge or (pixgrid.h - amp) -- y location in the pixgrid of top edge of the wave
+  for x = 0, pixgrid.w-1 do
+    top = bar  + math.floor(math.sin(x/freq) * (amp/2))
+    for y = top, bar + amp do
+      pixgrid:set(x,y, c[1], c[2], c[3], T.Sand)
+    end
+  end
+end
+
+function prepoluatePixgrid(pixgrid)
+  addSandDunes(pixgrid, 15, 12)
 end
 
 return M
