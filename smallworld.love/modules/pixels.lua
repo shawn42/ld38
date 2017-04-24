@@ -85,8 +85,10 @@ M.updateWorld = function(world, action)
           end
         end
       end
-
-      automateTheCellular(world.pixgrid)
+      local cellSteps = 2
+      for i=1,cellSteps do
+        automateTheCellular(world.pixgrid)
+      end
     end
 
   elseif action.type == 'mouse' then
@@ -148,6 +150,7 @@ M.drawWorld = function(world)
   love.graphics.setPointSize(s)
   love.graphics.scale(s,s)
   love.graphics.points(world.pixgrid.buf)
+  love.graphics.print("Current FPS: "..tostring(love.timer.getFPS( )), 10, 10)
 end
 
 
