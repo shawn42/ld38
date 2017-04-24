@@ -34,7 +34,7 @@ M.newWorld = function(opts)
     },
   }
 
-  local scale = opts.scale or 2
+  local scale = opts.scale or 1
   world.pixgrid = Pixgrid({
     w=world.bounds.w/scale,
     h=world.bounds.h/scale,
@@ -130,6 +130,12 @@ M.updateWorld = function(world, action)
       elseif action.key == '2' then
         world.painter.type = T.Leaf
         world.painter.color = Color.Leaf
+      elseif action.key == '3' then
+        world.painter.type = T.Water
+        world.painter.color = Color.Water
+      elseif action.key == '4' then
+        world.painter.type = T.Stone
+        world.painter.color = Color.Stone
       end
     end
   end
@@ -158,22 +164,22 @@ function automateTheCellular(pixgrid)
     if p.type == T.Sand then
       local above = pixgrid:get(p[1],p[2]-1)
       local below = pixgrid:get(p[1],p[2]+1)
-      if below and below.type == T.Off then
+      if below and (below.type == T.Off or below.type == T.Water) then
         -- move me down
         table.insert(moves, {p,
           {below[1], below[2], p[3],p[4],p[5], p.type}})
 
       elseif above and above.type ~= T.Off then
+        -- move left or right due to weight from above:
         local left = pixgrid:get(p[1]-1,p[2])
         local right = pixgrid:get(p[1]+1,p[2])
-
         local goLeft = love.math.random(0,1) == 1
         if goLeft and left and left.type == T.Off then
           table.insert(moves, {p,
-            {left[1], left[2], p[3],p[4],p[5], p.type}})
+          {left[1], left[2], p[3],p[4],p[5], p.type}})
         elseif right and right.type == T.Off then
           table.insert(moves, {p,
-            {right[1], right[2], p[3],p[4],p[5], p.type}})
+          {right[1], right[2], p[3],p[4],p[5], p.type}})
         end
       end
 
@@ -196,13 +202,59 @@ function automateTheCellular(pixgrid)
             {below[1], below[2], p[3],p[4],p[5], p.type}})
         end
       end
+    elseif p.type == T.Water then
+      local below = pixgrid:get(p[1],p[2]+1)
+      if below and below.type == T.Off then
+          table.insert(moves, {p,
+            {below[1], below[2], p[3],p[4],p[5], p.type}})
+      else
+        local lowleft = pixgrid:get(p[1]-1,p[2]+1)
+        local lowright = pixgrid:get(p[1]+1,p[2]+1)
+        local go, flipcoin
+        if lowleft and lowleft.type == T.Off then
+          if lowright and lowright.type == T.Off then
+            flipcoin = true
+          else
+            go = lowleft
+          end
+        elseif lowright and lowright.type == T.Off then
+          go = lowright
+        end
+        if flipcoin then
+          if math.random(0,1) == 0 then
+            go = lowleft
+          else
+            go = lowright
+          end
+        end
+
+        if not go then
+          local left = pixgrid:get(p[1]-1,p[2])
+          local right = pixgrid:get(p[1]+1,p[2])
+          if left and left.type == T.Off then
+            go = left
+          elseif right and right.type == T.Off then
+            go = right
+          end
+        end
+
+        if go then
+          table.insert(moves, {p,
+            {go[1],go[2], p[3],p[4],p[5],p.type}})
+        end
+      end
     end
+
   end
 
+  --
+  -- Resolve clears, sets and moves:
+  --
 
   for i=1,#clears do
     pixgrid:clear(clears[i][1], clears[i][2])
   end
+
   -- for i=1,#sets do
   --   pixgrid:set(unpack(v))
   -- end
@@ -223,7 +275,6 @@ function automateTheCellular(pixgrid)
   end
 
 end
-
 
 local function addSandDunes(pixgrid, freq, amp, topEdge)
   local top, y
