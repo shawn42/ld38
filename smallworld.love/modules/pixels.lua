@@ -261,7 +261,6 @@ function automateTheCellular(pixgrid)
 
   local did = {}
   local w = pixgrid.w
-  local targ
   for i=1,#moves do
     src = moves[i][1]
     dest = moves[i][2]
