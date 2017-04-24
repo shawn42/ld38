@@ -161,6 +161,9 @@ function automateTheCellular(pixgrid)
 
   for i=1,#pixgrid.buf do
     local p = pixgrid.buf[i]
+    --
+    -- SAND
+    --
     if p.type == T.Sand then
       local above = pixgrid:get(p[1],p[2]-1)
       local below = pixgrid:get(p[1],p[2]+1)
@@ -182,7 +185,9 @@ function automateTheCellular(pixgrid)
           {right[1], right[2], p[3],p[4],p[5], p.type}})
         end
       end
-
+    --
+    -- LEAF
+    --
     elseif p.type == T.Leaf then
       local below = pixgrid:get(p[1],p[2]+1)
       if below and below.type == T.Off then
@@ -202,6 +207,9 @@ function automateTheCellular(pixgrid)
             {below[1], below[2], p[3],p[4],p[5], p.type}})
         end
       end
+    --
+    -- WATER
+    --
     elseif p.type == T.Water then
       local below = pixgrid:get(p[1],p[2]+1)
       if below and below.type == T.Off then
