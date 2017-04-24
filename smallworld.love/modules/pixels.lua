@@ -80,7 +80,10 @@ M.updateWorld = function(world, action)
         for i=1,painter.brushSize do
           local x = painter.x + love.math.random(-painter.brushSize, painter.brushSize)
           local y = painter.y + love.math.random(-painter.brushSize, painter.brushSize)
-          world.pixgrid:set(x, y, painter.color[1], painter.color[2], painter.color[3], painter.type)
+          local p = world.pixgrid:get(x,y)
+          if p and p.type == T.Off then
+            world.pixgrid:set(x, y, painter.color[1], painter.color[2], painter.color[3], painter.type)
+          end
         end
       end
 
@@ -114,10 +117,14 @@ M.updateWorld = function(world, action)
 
   elseif action.type == 'keyboard' then
     if action.state == 'pressed' then
+
+      -- Stepping
       if action.key == 's' then
         world.timectrl.stepwise = not world.timectrl.stepwise
       elseif action.key == 'space' then
         world.timectrl.stepped = true
+
+      -- Brush selection
       elseif action.key == '1' then
         world.painter.type = T.Sand
         world.painter.color = Color.Sand
