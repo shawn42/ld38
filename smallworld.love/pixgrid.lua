@@ -1,10 +1,5 @@
 local LCS = require 'vendor/LCS'
 
-local T = {
-  Off = 0,
-  Leaf = 1,
-}
-
 local Pixgrid = LCS.class({name = 'Pixgrid'})
 
 function Pixgrid:init(opts)
@@ -16,7 +11,7 @@ function Pixgrid:init(opts)
   for r=0,self.h-1 do
     for c=0,self.w-1 do
       local pixel = {c,r, 0,0,0}
-      pixel.type = T.Off
+      pixel.type = 0 -- Pixtypes.Types.Off
       table.insert(self.buf, pixel)
     end
   end
@@ -32,8 +27,18 @@ function Pixgrid:set(x,y,r,g,b,type)
   end
 end
 
+function Pixgrid:setc(x,y,color,type)
+  local pix = self.buf[1 + ((y * self.w) + x)]
+  if pix then
+    pix[3] = color[1]
+    pix[4] = color[2]
+    pix[5] = color[3]
+    pix.type = type
+  end
+end
+
 function Pixgrid:clear(x,y)
-  self:set(x,y, 0,0,0, T.Off)
+  self:set(x,y, 0,0,0, 0) -- Pixtypes.Types.Off
 end
 
 function Pixgrid:get(x,y)

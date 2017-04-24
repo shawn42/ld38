@@ -1,7 +1,10 @@
 local M = {}
 
 local Pixgrid = require 'pixgrid'
-local T = Pixgrid.Types
+local Pixtypes = require 'pixtypes'
+
+local T = Pixtypes.Type
+local Color = Pixtypes.Color
 
 local automateTheCellular
 
@@ -31,14 +34,15 @@ M.newWorld = function(opts)
     },
   }
 
-  local scale = opts.scale or 1
+  local scale = opts.scale or 2 
   world.pixgrid = Pixgrid({
     w=world.bounds.w/scale,
     h=world.bounds.h/scale,
     scale=scale,
   })
 
-  world.pixgrid:set(100,400, 150,255,150, T.Leaf)
+  local c = Color.Sand
+  world.pixgrid:set(100,400, c[1], c[2], c[3], T.Sand)
 
   return world
 end
@@ -88,8 +92,8 @@ M.updateWorld = function(world, action)
     if action.state == 'pressed' then
       if action.button == 1 then
         world.painter.on = true
-        world.painter.type = T.Leaf
-        world.painter.color = {150,255,150}
+        world.painter.type = T.Sand
+        world.painter.color = {255,255,150}
         world.painter.x = math.floor(action.x/s)
         world.painter.y = math.floor(action.y/s)
       else
@@ -137,7 +141,7 @@ function automateTheCellular(pixgrid)
 
   for i=1,#pixgrid.buf do
     local p = pixgrid.buf[i]
-    if p.type == T.Leaf then
+    if p.type == T.Sand then
       local above = pixgrid:get(p[1],p[2]-1)
       local below = pixgrid:get(p[1],p[2]+1)
       if below and below.type == T.Off then
