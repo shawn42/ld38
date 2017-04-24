@@ -34,7 +34,7 @@ M.newWorld = function(opts)
     },
   }
 
-  local scale = opts.scale or 2 
+  local scale = opts.scale or 2
   world.pixgrid = Pixgrid({
     w=world.bounds.w/scale,
     h=world.bounds.h/scale,
@@ -93,7 +93,7 @@ M.updateWorld = function(world, action)
       if action.button == 1 then
         world.painter.on = true
         world.painter.type = T.Sand
-        world.painter.color = {255,255,150}
+        world.painter.color = Color.Sand
         world.painter.x = math.floor(action.x/s)
         world.painter.y = math.floor(action.y/s)
       else
