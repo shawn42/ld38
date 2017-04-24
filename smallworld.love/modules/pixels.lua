@@ -20,10 +20,10 @@ M.newWorld = function(opts)
     bgcolor = {0,0,0},
     painter = {
       on = false,
-      type = T.Off,
-      color = {0,0,0},
       x = 0,
       y = 0,
+      type = T.Sand,
+      color = Color.Sand,
       brushSize = 10,
     },
     eraser = {
@@ -92,8 +92,6 @@ M.updateWorld = function(world, action)
     if action.state == 'pressed' then
       if action.button == 1 then
         world.painter.on = true
-        world.painter.type = T.Sand
-        world.painter.color = Color.Sand
         world.painter.x = math.floor(action.x/s)
         world.painter.y = math.floor(action.y/s)
       else
@@ -120,6 +118,12 @@ M.updateWorld = function(world, action)
         world.timectrl.stepwise = not world.timectrl.stepwise
       elseif action.key == 'space' then
         world.timectrl.stepped = true
+      elseif action.key == '1' then
+        world.painter.type = T.Sand
+        world.painter.color = Color.Sand
+      elseif action.key == '2' then
+        world.painter.type = T.Leaf
+        world.painter.color = Color.Leaf
       end
     end
   end
@@ -134,6 +138,10 @@ M.drawWorld = function(world)
   love.graphics.points(world.pixgrid.buf)
 end
 
+
+--
+-- UPDATE ALL THE PIXELS
+--
 function automateTheCellular(pixgrid)
   -- local sets = {}
   local clears = {}
@@ -148,8 +156,6 @@ function automateTheCellular(pixgrid)
         -- move me down
         table.insert(moves, {p,
           {below[1], below[2], p[3],p[4],p[5], p.type}})
-        -- table.insert(clears, p) -- clear my current cell
-        -- table.insert(sets, {below[1], below[2], p[3],p[4],p[5], p.type})
 
       elseif above and above.type ~= T.Off then
         local left = pixgrid:get(p[1]-1,p[2])
@@ -157,17 +163,32 @@ function automateTheCellular(pixgrid)
 
         local goLeft = love.math.random(0,1) == 1
         if goLeft and left and left.type == T.Off then
-          -- table.insert(clears, p)
-          -- table.insert(sets, {left[1], left[2], p[3],p[4],p[5], p.type})
           table.insert(moves, {p,
             {left[1], left[2], p[3],p[4],p[5], p.type}})
         elseif right and right.type == T.Off then
-          -- table.insert(clears, p)
-          -- table.insert(sets, {right[1], right[2], p[3],p[4],p[5], p.type})
           table.insert(moves, {p,
             {right[1], right[2], p[3],p[4],p[5], p.type}})
         end
+      end
 
+    elseif p.type == T.Leaf then
+      local below = pixgrid:get(p[1],p[2]+1)
+      if below and below.type == T.Off then
+        local act = love.math.random(1,4)
+        if act == 1 then
+          local left = pixgrid:get(p[1]-1, p[2])
+          if left and left.type == T.Off then
+            table.insert(moves, {p, {left[1], left[2], p[3],p[4],p[5], p.type}})
+          end
+        elseif act == 2 then
+          local right = pixgrid:get(p[1]+1, p[2])
+          if right and right.type == T.Off then
+            table.insert(moves, {p, {right[1], right[2], p[3],p[4],p[5], p.type}})
+          end
+        else
+          table.insert(moves, {p,
+            {below[1], below[2], p[3],p[4],p[5], p.type}})
+        end
       end
     end
   end
