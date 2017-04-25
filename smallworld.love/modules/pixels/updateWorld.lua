@@ -108,10 +108,56 @@ local function updateWorld(world, action)
 end
 
 
+local LCS = require 'vendor.LCS'
+local Changer = LCS.class({name = 'Changer'})
+
+function Changer:init()
+  self:reset()
+end
+
+function Changer:reset()
+  -- self.sets = {}
+  self.clears = {}
+  self.moves = {}
+end
+
+function Changer:move(src, dest)
+  table.insert(self.moves, {src, dest})
+  -- table.insert(self.moves, {src, dest[1],dest[2], src[3],src[4],src[5], src.type})
+end
+
+function Changer:clear(src)
+  table.insert(self.clears, src)
+end
+
+function Changer:apply(pixgrid)
+  for i=1,#self.clears do
+    pixgrid:clear(self.clears[i][1], self.clears[i][2])
+  end
+
+  -- for i=1,#sets do
+  --   pixgrid:set(unpack(v))
+  -- end
+
+  local did = {}
+  local w = pixgrid.w
+  for i=1,#self.moves do
+    src = self.moves[i][1]
+    dest = self.moves[i][2]
+
+    idx = 1 + dest[1] + (dest[2]*w)
+    if not did[idx] then
+      -- pixgrid:set(unpack(dest))
+      pixgrid:set(dest[1],dest[2], src[3],src[4],src[5], src.type)
+      pixgrid:clear(src[1],src[2])
+      did[idx] = true
+    end
+  end
+end
+
+local changer = Changer()
 function automateTheCellular(pixgrid)
-  -- local sets = {}
-  local clears = {}
-  local moves = {}
+  changer:reset()
 
   for i=1,#pixgrid.buf do
     local p = pixgrid.buf[i]
@@ -123,8 +169,7 @@ function automateTheCellular(pixgrid)
       local below = pixgrid:get(p[1],p[2]+1)
       if below and (below.type == T.Off or below.type == T.Water) then
         -- move me down
-        table.insert(moves, {p,
-          {below[1], below[2], p[3],p[4],p[5], p.type}})
+        changer:move(p, below)
 
       elseif above and above.type ~= T.Off then
         -- move left or right due to weight from above:
@@ -132,11 +177,9 @@ function automateTheCellular(pixgrid)
         local right = pixgrid:get(p[1]+1,p[2])
         local goLeft = love.math.random(0,1) == 1
         if goLeft and left and left.type == T.Off then
-          table.insert(moves, {p,
-          {left[1], left[2], p[3],p[4],p[5], p.type}})
+          changer:move(p, left)
         elseif right and right.type == T.Off then
-          table.insert(moves, {p,
-          {right[1], right[2], p[3],p[4],p[5], p.type}})
+          changer:move(p, right)
         end
       end
     --
@@ -149,16 +192,15 @@ function automateTheCellular(pixgrid)
         if act == 1 then
           local left = pixgrid:get(p[1]-1, p[2])
           if left and left.type == T.Off then
-            table.insert(moves, {p, {left[1], left[2], p[3],p[4],p[5], p.type}})
+            changer:move(p, left)
           end
         elseif act == 2 then
           local right = pixgrid:get(p[1]+1, p[2])
           if right and right.type == T.Off then
-            table.insert(moves, {p, {right[1], right[2], p[3],p[4],p[5], p.type}})
+            changer:move(p, right)
           end
         else
-          table.insert(moves, {p,
-            {below[1], below[2], p[3],p[4],p[5], p.type}})
+          changer:move(p, below)
         end
       end
     --
@@ -167,8 +209,7 @@ function automateTheCellular(pixgrid)
     elseif p.type == T.Water then
       local below = pixgrid:get(p[1],p[2]+1)
       if below and below.type == T.Off then
-          table.insert(moves, {p,
-            {below[1], below[2], p[3],p[4],p[5], p.type}})
+          changer:move(p, below)
       else
         local lowleft = pixgrid:get(p[1]-1,p[2]+1)
         local lowright = pixgrid:get(p[1]+1,p[2]+1)
@@ -201,39 +242,14 @@ function automateTheCellular(pixgrid)
         end
 
         if go then
-          table.insert(moves, {p,
-            {go[1],go[2], p[3],p[4],p[5],p.type}})
+          changer:move(p, go)
         end
       end
     end
-
   end
 
-  --
-  -- Resolve clears, sets and moves:
-  --
+  changer:apply(pixgrid)
 
-  for i=1,#clears do
-    pixgrid:clear(clears[i][1], clears[i][2])
-  end
-
-  -- for i=1,#sets do
-  --   pixgrid:set(unpack(v))
-  -- end
-
-  local did = {}
-  local w = pixgrid.w
-  for i=1,#moves do
-    src = moves[i][1]
-    dest = moves[i][2]
-
-    idx = 1 + dest[1] + (dest[2]*w)
-    if not did[idx] then
-      pixgrid:set(unpack(dest))
-      pixgrid:clear(src[1],src[2])
-      did[idx] = true
-    end
-  end
 
 end
 
