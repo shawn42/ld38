@@ -6,6 +6,8 @@ local Pixtypes = require 'pixtypes'
 local T = Pixtypes.Type
 local Color = Pixtypes.Color
 
+local Stats = require 'stats'
+
 local automateTheCellular, prepoluatePixgrid
 
 M.newWorld = function(opts)
@@ -49,6 +51,7 @@ end
 
 M.updateWorld = function(world, action)
   if action.type == "tick" then
+    local startTime = love.timer.getTime()
     -- Use timectrl to decide if we should update this tick or not:
     local tc = world.timectrl
     local doUpdate = false
@@ -90,6 +93,8 @@ M.updateWorld = function(world, action)
         automateTheCellular(world.pixgrid)
       end
     end
+    Stats.trackUpdateTime(love.timer.getTime() - startTime)
+    Stats.trackFPS(love.timer.getFPS())
 
   elseif action.type == 'mouse' then
     local s = world.pixgrid.scale
@@ -141,16 +146,26 @@ M.updateWorld = function(world, action)
       end
     end
   end
+
   return world, nil
 end
 
 M.drawWorld = function(world)
   love.graphics.setBackgroundColor(unpack(world.bgcolor))
+  love.graphics.setColor(255,255,255)
+
+  love.graphics.push()
   local s = world.pixgrid.scale
   love.graphics.setPointSize(s)
   love.graphics.scale(s,s)
   love.graphics.points(world.pixgrid.buf)
+  love.graphics.pop()
+
   -- love.graphics.print("Current FPS: "..tostring(love.timer.getFPS( )), 10, 10)
+  -- love.graphics.print("Num times: "..tostring(#Stats.updateTimes), 10, 20)
+  love.graphics.setPointSize(1)
+  Stats.drawFPSChart(2,2)
+  Stats.drawUpdateTimesChart(2,30)
 end
 
 
