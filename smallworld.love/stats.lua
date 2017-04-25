@@ -30,7 +30,7 @@ function Stats.drawUpdateTimesChart(x,y)
     love.graphics.line(i+x, top, i+x,base)
   end
   local avg = math.round1(sum / num)
-  love.graphics.print(tostring(avg), x+#updateTimes+1,y+base/4)
+  love.graphics.print(tostring(avg).." ms", x+#updateTimes+1,y+base/4)
   love.graphics.setColor(255,0,0)
   local barY = base-16
   love.graphics.line(x, barY, num, barY)
@@ -56,7 +56,7 @@ function Stats.drawFPSChart(x,y)
   end
   love.graphics.setColor(255,255,255)
   love.graphics.rectangle("line", x, y, #fpsSeries, updateTimesChartHeight)
-  love.graphics.print("FPS: "..tostring(fpsSeries[#fpsSeries]), x+#fpsSeries+1,y+base/4)
+  love.graphics.print(tostring(fpsSeries[#fpsSeries]).." fps", x+#fpsSeries+1,y+base/4)
 end
 
 -- Stats.updateTimes = updateTimes
