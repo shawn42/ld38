@@ -30,6 +30,7 @@ local function newWorld(opts)
       y = 0,
       eraserSize = 10,
     },
+    drawStats = not (opts.drawStats == false),
   }
 
   local scale = opts.scale or 1
@@ -39,7 +40,11 @@ local function newWorld(opts)
     scale=scale,
   })
 
-  prepoluatePixgrid(world.pixgrid)
+  if opts.pixeldata then
+    world.pixgrid:setBuffer(opts.pixeldata)
+  else
+    prepoluatePixgrid(world.pixgrid)
+  end
 
   return world
 end

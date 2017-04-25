@@ -17,6 +17,10 @@ function Pixgrid:init(opts)
   end
 end
 
+function Pixgrid:setBuffer(newBuf)
+  self.buf = newBuf
+end
+
 function Pixgrid:set(x,y,r,g,b,type)
   local pix = self.buf[1 + ((y * self.w) + x)]
   if pix then

@@ -3,6 +3,7 @@ require 'helpers'
 local WIDTH = 800
 local HEIGHT = 600
 local SCALE = 2
+-- local SCALE = 20
 local ITERATIONS = 2
 
 local RootModule = require 'modules/pixels'
@@ -11,11 +12,15 @@ local RootModule = require 'modules/pixels'
 local world
 
 function love.load()
+  -- local snail = love.filesystem.load('data/snail.lua')()
+
   love.window.setMode(WIDTH,HEIGHT)
   world = RootModule.newWorld({
     bounds={x=0,y=0,w=WIDTH,h=HEIGHT}, -- unscaled pixel size
     scale=SCALE,              -- apparent pixel size on screen
     iterations=ITERATIONS,
+    -- pixeldata=snail,
+    -- drawStats=false,
   })
 end
 
