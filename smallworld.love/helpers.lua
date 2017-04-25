@@ -4,6 +4,9 @@
 -- Messy grab-bag of any useful helper funcs and extensions I want globally
 -- available.
 
+-- Enable loading a dir as a package via ${package}/init.lua
+package.path = package.path .. ";./?/init.lua"
+
 numberlua = require 'vendor/numberlua' -- intentionally global
 bit32 = numberlua.bit32 -- intentionally global
 
