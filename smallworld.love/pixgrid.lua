@@ -1,3 +1,6 @@
+local Pixtypes = require 'pixtypes'
+local T = Pixtypes.Type
+
 local LCS = require 'vendor/LCS'
 
 local Pixgrid = LCS.class({name = 'Pixgrid'})
@@ -21,28 +24,19 @@ function Pixgrid:setBuffer(newBuf)
   self.buf = newBuf
 end
 
-function Pixgrid:set(x,y,r,g,b,type)
+function Pixgrid:set(x,y,r,g,b,type,data)
   local pix = self.buf[1 + ((y * self.w) + x)]
   if pix then
     pix[3] = r
     pix[4] = g
     pix[5] = b
     pix.type = type
-  end
-end
-
-function Pixgrid:setc(x,y,color,type)
-  local pix = self.buf[1 + ((y * self.w) + x)]
-  if pix then
-    pix[3] = color[1]
-    pix[4] = color[2]
-    pix[5] = color[3]
-    pix.type = type
+    pix.data = data
   end
 end
 
 function Pixgrid:clear(x,y)
-  self:set(x,y, 0,0,0, 0) -- Pixtypes.Types.Off
+  self:set(x,y, 0,0,0, T.Off ,nil)
 end
 
 function Pixgrid:get(x,y)
@@ -50,6 +44,18 @@ function Pixgrid:get(x,y)
   -- 1,0 -> 2   -- x+1
   -- 5,1 -> -- 85 == ((80 * 1) + 5) + 1
   return self.buf[1+((y * self.w) + x)]
+end
+
+function Pixgrid:applyBufferAt(buf, xOffset, yOffset)
+  for i=1,#buf do
+    local p = buf[i]
+    local x = p[1] + xOffset
+    local y = p[2] + yOffset
+
+    local t = p.type
+    if t ~= T.Off then t = T.Entity end -- quick fix, avoids the poor snail's shell from crumbling
+    self:set(x,y, p[3],p[4],p[5],t,p.data)
+  end
 end
 
 local Changer = LCS.class({name = 'Changer'})

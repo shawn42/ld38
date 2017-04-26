@@ -3,7 +3,7 @@ require 'helpers'
 local WIDTH = 800
 local HEIGHT = 600
 local SCALE = 2
--- local SCALE = 20
+-- local SCALE = 20 -- for viewing the snail
 local ITERATIONS = 2
 
 local RootModule = require 'modules/pixels'

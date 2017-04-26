@@ -46,6 +46,10 @@ local function newWorld(opts)
     prepoluatePixgrid(world.pixgrid)
   end
 
+  local snailBuf = love.filesystem.load('data/snail.lua')()
+  world.pixgrid:applyBufferAt(snailBuf, 100,100)
+
+
   return world
 end
 

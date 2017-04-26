@@ -4,6 +4,7 @@ local Type = {
   Leaf = 2,
   Water = 3,
   Stone = 4,
+  Entity = 5,
 }
 
 local Color = {
