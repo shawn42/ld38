@@ -56,8 +56,8 @@ local function updateWorld(world, action)
   elseif action.type == 'mouse' then
     local s = world.pixgrid.scale
     local bounds = world.pixgridBounds
-    local pgx = (action.x - bounds.x) / s
-    local pgy = (action.y - bounds.y) / s
+    local pgx = action.x / s
+    local pgy = action.y / s
     -- if math.pointinbounds(x,y, bounds) then
     --   action.x = action.x + bounds.x
     --   action.y = action.y + bounds.y

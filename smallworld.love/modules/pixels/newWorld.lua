@@ -16,12 +16,12 @@ local function newWorld(opts)
       stepped = false,
     },
     bounds = bounds,
-    pixgridBounds = {
-      x=bounds.x+50,
-      y=bounds.y+50,
-      w=bounds.w-100,
-      h=bounds.h-100,
-    },
+    -- pixgridBounds = {
+    --   x=bounds.x+50,
+    --   y=bounds.y+50,
+    --   w=bounds.w-100,
+    --   h=bounds.h-100,
+    -- },
     bgcolor = {0,0,50},
     painter = {
       on = false,
@@ -37,13 +37,12 @@ local function newWorld(opts)
       y = 0,
       eraserSize = 10,
     },
-    drawStats = not (opts.drawStats == false),
   }
 
   local scale = opts.scale or 1
   world.pixgrid = Pixgrid({
-    w=world.pixgridBounds.w / scale,
-    h=world.pixgridBounds.h / scale,
+    w=world.bounds.w / scale,
+    h=world.bounds.h / scale,
     scale=scale,
   })
 
