@@ -204,6 +204,10 @@ function math.pointinrect(x1,y1, rx,ry,rw,rh)
   return x1 >= rx and x1 < rx+rw and y1 >= ry and y1 < ry + rh
 end
 
+function math.pointinbounds(x1,y1, b)
+  return x1 >= b.x and x1 < b.x+b.w and y1 >= b.y and y1 < b.y + b.h
+end
+
 function math.clamp(val, min, max)
   if val < min then
     return min, true

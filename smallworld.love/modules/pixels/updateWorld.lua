@@ -55,15 +55,23 @@ local function updateWorld(world, action)
 
   elseif action.type == 'mouse' then
     local s = world.pixgrid.scale
+    local bounds = world.pixgridBounds
+    local pgx = (action.x - bounds.x) / s
+    local pgy = (action.y - bounds.y) / s
+    -- if math.pointinbounds(x,y, bounds) then
+    --   action.x = action.x + bounds.x
+    --   action.y = action.y + bounds.y
+    -- end
+
     if action.state == 'pressed' then
       if action.button == 1 then
         world.painter.on = true
-        world.painter.x = math.floor(action.x/s)
-        world.painter.y = math.floor(action.y/s)
+        world.painter.x = math.floor(pgx)
+        world.painter.y = math.floor(pgy)
       else
         world.eraser.on = true
-        world.eraser.x = math.floor(action.x/s)
-        world.eraser.y = math.floor(action.y/s)
+        world.eraser.x = math.floor(pgx)
+        world.eraser.y = math.floor(pgy)
       end
     elseif action.state == 'released' then
       if action.button == 1 then
@@ -72,10 +80,10 @@ local function updateWorld(world, action)
         world.eraser.on = false
       end
     elseif action.state == 'moved' then
-      world.painter.x = math.floor(action.x/s)
-      world.painter.y = math.floor(action.y/s)
-      world.eraser.x = math.floor(action.x/s)
-      world.eraser.y = math.floor(action.y/s)
+      world.painter.x = math.floor(pgx)
+      world.painter.y = math.floor(pgy)
+      world.eraser.x = math.floor(pgx)
+      world.eraser.y = math.floor(pgy)
     end
 
   elseif action.type == 'keyboard' then

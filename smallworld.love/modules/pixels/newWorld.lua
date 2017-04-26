@@ -6,6 +6,7 @@ local Color = Pixtypes.Color
 local prepoluatePixgrid
 
 local function newWorld(opts)
+  local bounds = opts.bounds
   local world = {
     iterations=opts.iterations,
     timectrl = {
@@ -14,8 +15,14 @@ local function newWorld(opts)
       stepwise = false,
       stepped = false,
     },
-    bounds = opts.bounds,
-    bgcolor = {0,0,0},
+    bounds = bounds,
+    pixgridBounds = {
+      x=bounds.x+50,
+      y=bounds.y+50,
+      w=bounds.w-100,
+      h=bounds.h-100,
+    },
+    bgcolor = {0,0,50},
     painter = {
       on = false,
       x = 0,
@@ -35,8 +42,8 @@ local function newWorld(opts)
 
   local scale = opts.scale or 1
   world.pixgrid = Pixgrid({
-    w=world.bounds.w/scale,
-    h=world.bounds.h/scale,
+    w=world.pixgridBounds.w / scale,
+    h=world.pixgridBounds.h / scale,
     scale=scale,
   })
 

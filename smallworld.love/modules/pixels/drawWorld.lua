@@ -6,13 +6,13 @@ local function drawWorld (world)
 
   love.graphics.push()
   local s = world.pixgrid.scale
-  love.graphics.setPointSize(s)
+  love.graphics.translate(world.pixgridBounds.x, world.pixgridBounds.y)
   love.graphics.scale(s,s)
+  love.graphics.setPointSize(s)
   love.graphics.points(world.pixgrid.buf)
   love.graphics.pop()
 
   if world.drawStats then
-    love.graphics.setPointSize(1)
     Stats.drawFPSChart(2,2)
     Stats.drawUpdateTimesChart(2,30)
   end
