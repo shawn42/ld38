@@ -8,7 +8,7 @@ M.newWorld = function(opts)
   local bounds = opts.bounds
 
   -- LAYOUT
-  local paletteB = {x=200, y=bounds.y, w=bounds.w-200, h=100}
+  local paletteB = {x=150, y=bounds.y, w=bounds.w-150, h=60}
   local pixworldB = {x=0, y=bounds.y+paletteB.h, w=bounds.w, h=bounds.h-paletteB.h}
   local layout = {
     {pixworldB, Pixels, "pixworld"},
