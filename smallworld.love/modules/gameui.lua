@@ -43,6 +43,7 @@ M.newWorld = function(opts)
 
     painter = {
       on = false,
+      erase = false,
       x = 0,
       y = 0,
     },
@@ -54,9 +55,14 @@ M.updateWorld = function(world, action)
   if action.type == "tick" then
     local startTime = love.timer.getTime()
 
-    if world.painter.on then
+    if world.painter.eraser or world.painter.on then
       -- Generate a "paint" action to the pixworld:
-      local brush = world.palette.brushes[world.palette.brushName] -- mmmmm... is it ok to peek inside another world's state?
+      local brush
+      if world.painter.eraser then
+        brush = world.palette.brushes[world.palette.eraserName] -- mmmmm... is it ok to peek inside another world's state?
+      else
+        brush = world.palette.brushes[world.palette.brushName] -- mmmmm... is it ok to peek inside another world's state?
+      end
       local paintAction = {
         type="paint",
         x=world.painter.x,
@@ -75,12 +81,14 @@ M.updateWorld = function(world, action)
 
   elseif action.type == "mouse" then
     if action.state == "pressed" then
-      if action.button == 1 then
-        local pixworldB = world.boxes.pixworld
-        if math.pointinbounds(action.x,action.y, pixworldB) then
+      local pixworldB = world.boxes.pixworld
+      if math.pointinbounds(action.x,action.y, pixworldB) then
+        world.painter.x = action.x - pixworldB.x
+        world.painter.y = action.y - pixworldB.y
+        if action.button == 1 then
           world.painter.on = true
-          world.painter.x = action.x - pixworldB.x
-          world.painter.y = action.y - pixworldB.y
+        elseif action.button == 2 then
+          world.painter.eraser = true
         end
       end
 
@@ -94,7 +102,11 @@ M.updateWorld = function(world, action)
       end
 
     elseif action.state == "released" then
-      world.painter.on = false
+      if action.button == 1 then
+        world.painter.on = false
+      elseif action.button == 2 then
+        world.painter.eraser = false
+      end
 
       -- FIXME: needed anymore?
       -- iterate the items in world.layout and deliver a properly offset mouse released action:

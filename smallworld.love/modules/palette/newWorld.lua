@@ -43,7 +43,7 @@ local items = {
   {label="2", typeName="Leaf"},
   {label="3", typeName="Water"},
   {label="4", typeName="Stone"},
-  {label="0", typeName="ERASER"},
+  -- {label="0", typeName="ERASER"}, -- this works, and adds eraser to the palette as a normal brush.
 }
 
 
@@ -53,6 +53,7 @@ local function newWorld(opts)
     items=items,
     brushes=brushes,
     brushName="Sand",
+    eraserName="ERASER",
   }
   return world
 end
