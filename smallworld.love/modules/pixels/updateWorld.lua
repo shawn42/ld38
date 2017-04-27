@@ -6,6 +6,22 @@ local Color = Pixtypes.Color
 
 local automateTheCellular
 
+local function squareBrush(pixgrid,x,y,brush)
+  -- print("squareBrush "..x..","..y..","..tflatten(brush))
+  for i=1,brush.rate do
+    local x = x + love.math.random(-brush.size, brush.size)
+    local y = y + love.math.random(-brush.size, brush.size)
+    local p = pixgrid:get(x,y)
+    if p and p.type == T.Off then
+      pixgrid:set(x, y, brush.color[1], brush.color[2], brush.color[3], brush.type)
+    end
+  end
+end
+
+local function paintBrush(pixgrid, x,y, brush)
+  squareBrush(pixgrid, x,y, brush)
+end
+
 local function updateWorld(world, action)
   if action.type == "tick" then
     local startTime = love.timer.getTime()
@@ -28,24 +44,14 @@ local function updateWorld(world, action)
     end
 
     if doUpdate then
-      local painter = world.painter
-      local eraser = world.eraser
-      if eraser.on then
-          for ey=0,eraser.eraserSize-1 do
-            for ex=0,eraser.eraserSize-1 do
-              world.pixgrid:clear(eraser.x+ex, eraser.y+ey)
-            end
-          end
-      elseif painter.on then
-        for i=1,painter.brushSize do
-          local x = painter.x + love.math.random(-painter.brushSize, painter.brushSize)
-          local y = painter.y + love.math.random(-painter.brushSize, painter.brushSize)
-          local p = world.pixgrid:get(x,y)
-          if p and p.type == T.Off then
-            world.pixgrid:set(x, y, painter.color[1], painter.color[2], painter.color[3], painter.type)
-          end
-        end
-      end
+      -- local eraser = world.eraser
+      -- if eraser.on then
+      --     for ey=0,eraser.eraserSize-1 do
+      --       for ex=0,eraser.eraserSize-1 do
+      --         world.pixgrid:clear(eraser.x+ex, eraser.y+ey)
+      --       end
+      --     end
+      -- end
       for i=1,world.iterations do
         automateTheCellular(world.pixgrid)
       end
@@ -53,38 +59,12 @@ local function updateWorld(world, action)
     Stats.trackUpdateTime(love.timer.getTime() - startTime)
     Stats.trackFPS(love.timer.getFPS())
 
-  elseif action.type == 'mouse' then
+  elseif action.type == 'paint' then
     local s = world.pixgrid.scale
     local bounds = world.pixgridBounds
-    local pgx = action.x / s
-    local pgy = action.y / s
-    -- if math.pointinbounds(x,y, bounds) then
-    --   action.x = action.x + bounds.x
-    --   action.y = action.y + bounds.y
-    -- end
-
-    if action.state == 'pressed' then
-      if action.button == 1 then
-        world.painter.on = true
-        world.painter.x = math.floor(pgx)
-        world.painter.y = math.floor(pgy)
-      else
-        world.eraser.on = true
-        world.eraser.x = math.floor(pgx)
-        world.eraser.y = math.floor(pgy)
-      end
-    elseif action.state == 'released' then
-      if action.button == 1 then
-        world.painter.on = false
-      else
-        world.eraser.on = false
-      end
-    elseif action.state == 'moved' then
-      world.painter.x = math.floor(pgx)
-      world.painter.y = math.floor(pgy)
-      world.eraser.x = math.floor(pgx)
-      world.eraser.y = math.floor(pgy)
-    end
+    local pgx = math.floor(action.x / s)
+    local pgy = math.floor(action.y / s)
+    paintBrush(world.pixgrid, pgx, pgy, action.brush)
 
   elseif action.type == 'keyboard' then
     if action.state == 'pressed' then
@@ -95,19 +75,6 @@ local function updateWorld(world, action)
       elseif action.key == 'space' then
         world.timectrl.stepped = true
 
-      -- Brush selection
-      elseif action.key == '1' then
-        world.painter.type = T.Sand
-        world.painter.color = Color.Sand
-      elseif action.key == '2' then
-        world.painter.type = T.Leaf
-        world.painter.color = Color.Leaf
-      elseif action.key == '3' then
-        world.painter.type = T.Water
-        world.painter.color = Color.Water
-      elseif action.key == '4' then
-        world.painter.type = T.Stone
-        world.painter.color = Color.Stone
       end
     end
   end

@@ -16,27 +16,7 @@ local function newWorld(opts)
       stepped = false,
     },
     bounds = bounds,
-    -- pixgridBounds = {
-    --   x=bounds.x+50,
-    --   y=bounds.y+50,
-    --   w=bounds.w-100,
-    --   h=bounds.h-100,
-    -- },
     bgcolor = {0,0,50},
-    painter = {
-      on = false,
-      x = 0,
-      y = 0,
-      type = T.Sand,
-      color = Color.Sand,
-      brushSize = 10,
-    },
-    eraser = {
-      on = false,
-      x = 0,
-      y = 0,
-      eraserSize = 10,
-    },
   }
 
   local scale = opts.scale or 1
