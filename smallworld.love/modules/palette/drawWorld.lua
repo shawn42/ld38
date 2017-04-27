@@ -9,7 +9,8 @@ local bh=50
 local spacer=4
 
 local function drawItem(item,x,y,w,h,selected)
-  love.graphics.setColor(unpack(C[item.typeName]))
+  local color = C[item.typeName] or {255,255,255}
+  love.graphics.setColor(color)
   love.graphics.rectangle("fill", x+5,y+5, w-10,h-10)
 
   love.graphics.setColor(0,0,0)

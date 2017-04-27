@@ -6,21 +6,38 @@ local Color = Pixtypes.Color
 
 local automateTheCellular
 
-local function squareBrush(pixgrid,x,y,brush)
-  -- print("squareBrush "..x..","..y..","..tflatten(brush))
-  for i=1,brush.rate do
-    local x = x + love.math.random(-brush.size, brush.size)
-    local y = y + love.math.random(-brush.size, brush.size)
-    local p = pixgrid:get(x,y)
-    if p and p.type == T.Off then
-      pixgrid:set(x, y, brush.color[1], brush.color[2], brush.color[3], brush.type)
+local brushStyleFuncs = {
+  squareSpray = function(pixgrid,x,y,brush)
+    for i=1,brush.rate do
+      local x = x + love.math.random(-brush.size, brush.size)
+      local y = y + love.math.random(-brush.size, brush.size)
+      local p = pixgrid:get(x,y)
+      if p and p.type == T.Off then
+        pixgrid:set(x, y, brush.color[1], brush.color[2], brush.color[3], brush.type)
+      end
     end
-  end
-end
+  end,
 
-local function paintBrush(pixgrid, x,y, brush)
-  squareBrush(pixgrid, x,y, brush)
-end
+  squareSolid = function(pixgrid,x,y,brush)
+    local s = brush.size
+    local base = - math.floor(s/2)
+    for y2=base, base+s do
+      for x2=base, base+s do
+        pixgrid:set(x+x2, y+y2, brush.color[1], brush.color[2], brush.color[3], brush.type)
+      end
+    end
+  end,
+
+  eraser = function(pixgrid,x,y,brush)
+    local s = brush.size
+    local base = - math.floor(s/2)
+    for y2=base, base+s do
+      for x2=base, base+s do
+        pixgrid:clear(x+x2, y+y2)
+      end
+    end
+  end,
+}
 
 local function updateWorld(world, action)
   if action.type == "tick" then
@@ -44,14 +61,6 @@ local function updateWorld(world, action)
     end
 
     if doUpdate then
-      -- local eraser = world.eraser
-      -- if eraser.on then
-      --     for ey=0,eraser.eraserSize-1 do
-      --       for ex=0,eraser.eraserSize-1 do
-      --         world.pixgrid:clear(eraser.x+ex, eraser.y+ey)
-      --       end
-      --     end
-      -- end
       for i=1,world.iterations do
         automateTheCellular(world.pixgrid)
       end
@@ -60,11 +69,14 @@ local function updateWorld(world, action)
     Stats.trackFPS(love.timer.getFPS())
 
   elseif action.type == 'paint' then
-    local s = world.pixgrid.scale
-    local bounds = world.pixgridBounds
-    local pgx = math.floor(action.x / s)
-    local pgy = math.floor(action.y / s)
-    paintBrush(world.pixgrid, pgx, pgy, action.brush)
+    local paintFunc = brushStyleFuncs[action.brush.style]
+    if paintFunc then
+      local s = world.pixgrid.scale
+      local bounds = world.pixgridBounds
+      local pgx = math.floor(action.x / s)
+      local pgy = math.floor(action.y / s)
+      paintFunc(world.pixgrid, pgx, pgy, action.brush)
+    end
 
   elseif action.type == 'keyboard' then
     if action.state == 'pressed' then
