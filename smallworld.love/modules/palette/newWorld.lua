@@ -29,6 +29,7 @@ local brushes = {
     size=5,
     color=C.Water,
     type=T.Water,
+    data={dir=0},
   },
   Stone = {
     style='squareSolid',

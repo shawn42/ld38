@@ -13,7 +13,7 @@ local brushStyleFuncs = {
       local y = y + love.math.random(-brush.size, brush.size)
       local p = pixgrid:get(x,y)
       if p and p.type == T.Off then
-        pixgrid:set(x, y, brush.color[1], brush.color[2], brush.color[3], brush.type)
+        pixgrid:set(x, y, brush.color[1], brush.color[2], brush.color[3], brush.type, brush.data)
       end
     end
   end,
@@ -23,7 +23,7 @@ local brushStyleFuncs = {
     local base = - math.floor(s/2)
     for y2=base, base+s do
       for x2=base, base+s do
-        pixgrid:set(x+x2, y+y2, brush.color[1], brush.color[2], brush.color[3], brush.type)
+        pixgrid:set(x+x2, y+y2, brush.color[1], brush.color[2], brush.color[3], brush.type, brush.data)
       end
     end
   end,
@@ -146,50 +146,141 @@ function automateTheCellular(pixgrid)
     -- WATER
     --
     elseif p.type == T.Water then
-      local below = pixgrid:get(p[1],p[2]+1)
-      if below and below.type == T.Off then
-          changer:move(p, below)
-      else
-        local lowleft = pixgrid:get(p[1]-1,p[2]+1)
-        local lowright = pixgrid:get(p[1]+1,p[2]+1)
-        local go, flipcoin
-        if lowleft and lowleft.type == T.Off then
-          if lowright and lowright.type == T.Off then
-            flipcoin = true
-          else
-            go = lowleft
-          end
-        elseif lowright and lowright.type == T.Off then
-          go = lowright
-        end
-        if flipcoin then
-          if math.random(0,1) == 0 then
-            go = lowleft
-          else
-            go = lowright
-          end
-        end
-
-        if not go then
-          local left = pixgrid:get(p[1]-1,p[2])
-          local right = pixgrid:get(p[1]+1,p[2])
-          if left and left.type == T.Off then
-            go = left
-          elseif right and right.type == T.Off then
-            go = right
-          end
-        end
-
-        if go then
-          changer:move(p, go)
-        end
-      end
+      -- water(p,pixgrid,changer)
+      waterWithDir(p,pixgrid,changer)
     end
   end
 
   changer:apply(pixgrid)
 
+end
 
+local WDBG = {
+
+}
+
+function water(p,pixgrid,changer)
+  local below = pixgrid:get(p[1],p[2]+1)
+  if below and below.type == T.Off then
+    changer:move(p, below)
+  else
+    local lowleft = pixgrid:get(p[1]-1,p[2]+1)
+    local lowright = pixgrid:get(p[1]+1,p[2]+1)
+    local go, flipcoin
+    if lowleft and lowleft.type == T.Off then
+      if lowright and lowright.type == T.Off then
+        flipcoin = true
+      else
+        go = lowleft
+      end
+    elseif lowright and lowright.type == T.Off then
+      go = lowright
+    end
+    if flipcoin then
+      if math.random(0,1) == 0 then
+        go = lowleft
+      else
+        go = lowright
+      end
+    end
+
+    if not go then
+      local left = pixgrid:get(p[1]-1,p[2])
+      local right = pixgrid:get(p[1]+1,p[2])
+      if left and left.type == T.Off then
+        go = left
+      elseif right and right.type == T.Off then
+        go = right
+      end
+    end
+
+    if go then
+      changer:move(p, go)
+    end
+  end
+end
+
+function waterWithDir(p,pixgrid,changer)
+  if p.data then
+    print("Data!")
+  else
+    print("no data")
+  end
+  local data = p.data
+  local dir = 0
+  if data then dir = data.dir end
+
+  local below = pixgrid:get(p[1],p[2]+1)
+  if below and below.type == T.Off then
+    changer:move(p, below)
+  else
+    local lowleft = pixgrid:get(p[1]-1,p[2]+1)
+    local lowright = pixgrid:get(p[1]+1,p[2]+1)
+    local go, flipcoin
+    if lowleft and lowleft.type == T.Off then
+      if lowright and lowright.type == T.Off then
+        if dir == -1 then
+          go = lowLeft
+        elseif dir == 1 then
+          go = lowRight
+        else
+          flipcoin = true
+        end
+      else
+        go = lowleft
+      end
+    elseif lowright and lowright.type == T.Off then
+      go = lowright
+    end
+    if flipcoin then
+      if math.random(0,1) == 0 then
+        go = lowleft
+      else
+        go = lowright
+      end
+    end
+    if go == lowleft then
+      p.data.dir = -1
+    elseif go == lowright then
+      p.data.dir = 1
+    end
+
+    if not go then
+      local left = pixgrid:get(p[1]-1,p[2])
+      local right = pixgrid:get(p[1]+1,p[2])
+      if left and left.type == T.Off then
+        if right and right.type == T.Off then
+          if dir == -1 then
+            go = left
+          elseif dir == 1 then
+            go = right
+          else
+            flipcoin = true
+          end
+        else
+          go = left
+        end
+      elseif right and right.type == T.Off then
+        go = right
+      end
+      if flipcoin then
+        if math.random(0,1) == 0 then
+          go = left
+        else
+          go = right
+        end
+      end
+      if go == left then
+        p.data.dir = -1
+      elseif go == right then
+        p.data.dir = 1
+      end
+    end
+
+    if go then
+      changer:move(p, go)
+    end
+  end
 end
 
 return updateWorld

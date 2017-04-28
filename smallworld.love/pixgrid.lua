@@ -97,7 +97,7 @@ function Changer:apply(pixgrid)
     idx = 1 + dest[1] + (dest[2]*w)
     if not did[idx] then
       -- pixgrid:set(unpack(dest))
-      pixgrid:set(dest[1],dest[2], src[3],src[4],src[5], src.type)
+      pixgrid:set(dest[1],dest[2], src[3],src[4],src[5], src.type, src.data)
       pixgrid:clear(src[1],src[2])
       did[idx] = true
     end
