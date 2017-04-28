@@ -5,6 +5,8 @@ local T = Pixtypes.Type
 local Color = Pixtypes.Color
 
 local automateTheCellular
+local water, waterWithDir, sand, leaf
+local pixtypeUpdaters = {}
 
 local brushStyleFuncs = {
   squareSpray = function(pixgrid,x,y,brush)
@@ -100,56 +102,27 @@ function automateTheCellular(pixgrid)
 
   for i=1,#pixgrid.buf do
     local p = pixgrid.buf[i]
-    --
-    -- SAND
-    --
-    if p.type == T.Sand then
-      local above = pixgrid:get(p[1],p[2]-1)
-      local below = pixgrid:get(p[1],p[2]+1)
-      if below and (below.type == T.Off or below.type == T.Water) then
-        -- move me down
-        changer:move(p, below)
-
-      elseif above and above.type ~= T.Off then
-        -- move left or right due to weight from above:
-        local left = pixgrid:get(p[1]-1,p[2])
-        local right = pixgrid:get(p[1]+1,p[2])
-        local goLeft = love.math.random(0,1) == 1
-        if goLeft and left and left.type == T.Off then
-          changer:move(p, left)
-        elseif right and right.type == T.Off then
-          changer:move(p, right)
-        end
-      end
-    --
-    -- LEAF
-    --
-    elseif p.type == T.Leaf then
-      local below = pixgrid:get(p[1],p[2]+1)
-      if below and below.type == T.Off then
-        local act = love.math.random(1,4)
-        if act == 1 then
-          local left = pixgrid:get(p[1]-1, p[2])
-          if left and left.type == T.Off then
-            changer:move(p, left)
-          end
-        elseif act == 2 then
-          local right = pixgrid:get(p[1]+1, p[2])
-          if right and right.type == T.Off then
-            changer:move(p, right)
-          end
-        else
-          changer:move(p, below)
-        end
-      end
-    --
-    -- WATER
-    --
-    elseif p.type == T.Water then
-      -- water(p,pixgrid,changer)
-      waterWithDir(p,pixgrid,changer)
-    end
+    local fn = pixtypeUpdaters[p.type]
+    if fn then fn(p,pixgrid,changer) end
   end
+    -- --
+    -- -- SAND
+    -- --
+    -- if p.type == T.Sand then
+    --   sand(p,pixgrid,changer)
+    -- --
+    -- -- LEAF
+    -- --
+    -- elseif p.type == T.Leaf then
+    --   leaf(p,pixgrid,changer)
+    -- --
+    -- -- WATER
+    -- --
+    -- elseif p.type == T.Water then
+    --   water(p,pixgrid,changer)
+    --   -- waterWithDir(p,pixgrid,changer)
+    -- end
+  -- end
 
   changer:apply(pixgrid)
 
@@ -158,6 +131,47 @@ end
 local WDBG = {
 
 }
+
+
+function leaf(p,pixgrid,changer)
+  local below = pixgrid:get(p[1],p[2]+1)
+  if below and below.type == T.Off then
+    local act = love.math.random(1,4)
+    if act == 1 then
+      local left = pixgrid:get(p[1]-1, p[2])
+      if left and left.type == T.Off then
+        changer:move(p, left)
+      end
+    elseif act == 2 then
+      local right = pixgrid:get(p[1]+1, p[2])
+      if right and right.type == T.Off then
+        changer:move(p, right)
+      end
+    else
+      changer:move(p, below)
+    end
+  end
+end
+
+function sand(p,pixgrid,changer)
+  local above = pixgrid:get(p[1],p[2]-1)
+  local below = pixgrid:get(p[1],p[2]+1)
+  if below and (below.type == T.Off or below.type == T.Water) then
+    -- move me down
+    changer:move(p, below)
+
+  elseif above and above.type ~= T.Off then
+    -- move left or right due to weight from above:
+    local left = pixgrid:get(p[1]-1,p[2])
+    local right = pixgrid:get(p[1]+1,p[2])
+    local goLeft = love.math.random(0,1) == 1
+    if goLeft and left and left.type == T.Off then
+      changer:move(p, left)
+    elseif right and right.type == T.Off then
+      changer:move(p, right)
+    end
+  end
+end
 
 function water(p,pixgrid,changer)
   local below = pixgrid:get(p[1],p[2]+1)
@@ -282,5 +296,9 @@ function waterWithDir(p,pixgrid,changer)
     end
   end
 end
+
+pixtypeUpdaters[T.Sand] = sand
+pixtypeUpdaters[T.Water] = water
+pixtypeUpdaters[T.Leaf] = leaf
 
 return updateWorld
