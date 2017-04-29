@@ -61,6 +61,15 @@ function tcopy(orig, defaults)
   return copy
 end
 
+function shallowclone(src)
+  if src == nil then return {} end
+  local dest={}
+  for k,v in pairs(src) do
+    dest[k]=v
+  end
+  return dest
+end
+
 function deeptcopy(orig)
   local orig_type = type(orig)
   local copy

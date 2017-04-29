@@ -15,6 +15,7 @@ local brushes = {
     size=10,
     color=C.Sand,
     type=T.Sand,
+    data={water=0,maxWater=100},
   },
   Leaf = {
     style='squareSpray',
@@ -29,11 +30,13 @@ local brushes = {
     size=5,
     color=C.Water,
     type=T.Water,
+    data={water=200},
   },
   SingleWater = {
     style='pixel',
     color=C.Water,
     type=T.Water,
+    data={water=200},
   },
   Stone = {
     style='squareSolid',

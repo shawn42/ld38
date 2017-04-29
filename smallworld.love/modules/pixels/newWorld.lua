@@ -46,7 +46,7 @@ local function addSandDunes(pixgrid, freq, amp, topEdge)
   for x = 0, pixgrid.w-1 do
     top = bar  + math.floor(math.sin(x/freq) * (amp/2))
     for y = top, bar + amp do
-      pixgrid:set(x,y, c[1], c[2], c[3], T.Sand)
+      pixgrid:set(x,y, c[1], c[2], c[3], T.Sand,{water=0,maxWater=100})
     end
   end
 end

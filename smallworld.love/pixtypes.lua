@@ -48,7 +48,7 @@ local function seed(p,pixgrid,changer)
     changer:move(p, Nei[Below])
     return
   end
-  if isType(Nei, Below, T.Sand) then
+  if not isType(Nei, Below, T.Sand) then
     p.data.t = p.data.t + 1
     if p.data.t > 60 then
       changer:clear(p)
@@ -85,14 +85,52 @@ local function sand(p,pixgrid,changer)
   if isType(Nei,Above,T.Sand) then
     if (love.math.random(0,1) == 1) and Nei[Left] and Nei[Left].type == T.Off then
       changer:move(p, Nei[Left])
+      return
     elseif Nei[Right] ~= 0 and Nei[Right].type == T.Off then
       changer:move(p, Nei[Right])
+      return
     end
   end
+  local w = p.data.water
+  if w < p.data.maxWater then
+    for i=2,6,2 do
+      -- if Nei[i] ~= 0 and Nei[i].data then print(tflatten(Nei[i].data)) end
+      -- if Nei[i] ~= 0 and Nei[i].data and Nei[i].data.water and Nei[i].data.water > 0 then
+      if isType(Nei,i,T.Water) then
+        local otherd = Nei[i].data
+        otherd.water = otherd.water - 1
+        w = w + 1
+        p.data.water = w
+        if w >= p.data.maxWater then break end
+      end
+    end
+  end
+  p[3] = math.max(C.Sand[1] - w, 130)
+  p[4] = math.max(C.Sand[2] - w, 130)
+  p[5] = math.max(C.Sand[3] - w, 0)
+  -- if isType(Nei,Above,T.Water) then
+  --   Nei[Above].data.water = Nei[Above].data.water - 1
+  --   p.data.water = p.data.water + 1
+  -- end
+  -- if isType(Nei,Left,T.Water) then
+  --   Nei[Left].data.water = Nei[Left].data.water - 1
+  --   p.data.water = p.data.water + 1
+  -- end
+  -- if isType(Nei,Right,T.Water) then
+  --   Nei[Right].data.water = Nei[Right].data.water - 1
+  --   p.data.water = p.data.water + 1
+  -- end
+  -- p[3] = math.max(p[3] - 1, 130)
+  -- p[4] = math.max(p[4] - 1, 130)
+  -- p[5] = math.max(p[5] - 1, 0)
 end
 
 
 local function water(p,pixgrid,changer)
+  if p.data.water <= 0 then
+    changer:clear(p)
+    return
+  end
   pixgrid:fillNeighbors(p,Nei)
   if Nei[Below] ~= 0 and Nei[Below].type == T.Off then
     changer:move(p,Nei[Below])

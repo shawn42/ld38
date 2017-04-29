@@ -29,6 +29,11 @@ M.newWorld = function(opts)
     iterations=opts.pixels.iterations,
     scale=opts.pixels.scale,
   })
+  -- local pixworld = Pixels.newWorld({
+  --   bounds={x=0,y=0, w=pixworldB.w, h=pixworldB.h}, -- pixworld won't internally understand that it's been offset by this outer ui
+  --   iterations=opts.pixels.iterations,
+  --   scale=20 -- opts.pixels.scale,
+  -- })
 
   -- WORLD
   local world = {
