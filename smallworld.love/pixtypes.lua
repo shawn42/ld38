@@ -8,7 +8,7 @@ local T = {
   Stone = 4,
   Entity = 5,
   Seed = 6,
-  Grass = 7,
+  Soil = 7,
 }
 
 local C = {
@@ -19,6 +19,7 @@ local C = {
   Stone = {150,150,150},
   Seed = {255,255,255},
   Grass = {0,255,0},
+  Soil = {107,76,42},
 }
 
 PT.Type = T
@@ -48,6 +49,10 @@ local function seed(p,pixgrid,changer)
     changer:move(p, Nei[Below])
     return
   end
+  if isType(Nei, Below, T.Soil) then
+    p.data.t = 0
+    return
+  end
   if not isType(Nei, Below, T.Sand) then
     p.data.t = p.data.t + 1
     if p.data.t > 60 then
@@ -75,6 +80,15 @@ local function leaf(p,pixgrid,changer)
   end
 end
 
+local function takeWater(a,b, amt, satRatio)
+  amt = amt * math.floor(math.min(0,satRatio - (a.water / b.water)) + 0.99999)
+  -- if (b.water <= 0) or (a.water / b.water > satRatio) then return 0 end
+  amt = math.min(amt, a.maxWater-a.water)
+  b.water = math.max(b.water-amt, 0)
+  a.water = a.water + origbw - b.water
+  return amt
+end
+
 local function sand(p,pixgrid,changer)
   pixgrid:fillNeighbors(p,Nei)
   if isType(Nei, Below, T.Off) or isType(Nei, Below, T.Water) then
@@ -92,44 +106,37 @@ local function sand(p,pixgrid,changer)
     end
   end
   local w = p.data.water
-  if w < p.data.maxWater then
+  local maxw = p.data.maxWater
+  if w < maxw then
     for i=2,6,2 do
       if isType(Nei,i,T.Water) then
         local otherd = Nei[i].data
         otherd.water = otherd.water - 2
         w = w + 2
         p.data.water = w
-        if w >= p.data.maxWater then break end
+        if w >= maxw then break end
 
       elseif isType(Nei,i,T.Sand) then
         local otherd = Nei[i].data
-        if otherd.water > 0 and w / otherd.water < 0.8 then
+        -- slurp water from sand but only if the saturation ratio is low enough
+        if otherd.water > 0 and w / otherd.water < 0.9 then
           otherd.water = otherd.water - 1
           w = w + 1
           p.data.water = w
-          if w >= p.data.maxWater then break end
+          if w >= maxw then break end
         end
       end
     end
   end
-  p[3] = math.max(C.Sand[1] - w, 130)
-  p[4] = math.max(C.Sand[2] - w, 130)
-  p[5] = math.max(C.Sand[3] - w, 0)
-  -- if isType(Nei,Above,T.Water) then
-  --   Nei[Above].data.water = Nei[Above].data.water - 1
-  --   p.data.water = p.data.water + 1
+  local color = C.Sand
+  -- When saturated, turn to Soil?
+  -- if w >= maxw then
+  --   p.type = T.Soil
+  --   color = C.Soil
   -- end
-  -- if isType(Nei,Left,T.Water) then
-  --   Nei[Left].data.water = Nei[Left].data.water - 1
-  --   p.data.water = p.data.water + 1
-  -- end
-  -- if isType(Nei,Right,T.Water) then
-  --   Nei[Right].data.water = Nei[Right].data.water - 1
-  --   p.data.water = p.data.water + 1
-  -- end
-  -- p[3] = math.max(p[3] - 1, 130)
-  -- p[4] = math.max(p[4] - 1, 130)
-  -- p[5] = math.max(p[5] - 1, 0)
+  p[3] = math.max(color[1] - w, 130)
+  p[4] = math.max(color[2] - w, 130)
+  p[5] = math.max(color[3] - w, 0)
 end
 
 
@@ -161,11 +168,20 @@ local function water(p,pixgrid,changer)
   end
 end
 
+local function soil(p,pixgrid,changer)
+  pixgrid:fillNeighbors(p,Nei)
+  if isType(Nei, Below, T.Off) or isType(Nei,Below,T.Water) then
+    changer:move(p, Nei[Below])
+    return
+  end
+end
+
 
 PT.Updaters = {}
 PT.Updaters[T.Sand] = sand
 PT.Updaters[T.Water] = water
 PT.Updaters[T.Leaf] = leaf
 PT.Updaters[T.Seed] = seed
+PT.Updaters[T.Soil] = soil
 
 return PT

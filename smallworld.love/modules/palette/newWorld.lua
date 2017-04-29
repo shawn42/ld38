@@ -44,6 +44,14 @@ local brushes = {
     color=C.Stone,
     type=T.Stone,
   },
+  Soil = {
+    style='squareSpray',
+    rate=6,
+    size=3,
+    color=C.Soil,
+    type=T.Soil,
+    data={},
+  },
   Seed = {
     style='pixel',
     color=C.Seed,
@@ -58,7 +66,8 @@ local items = {
   {key="3", label="3", brushName="Water", color=C.Water},
   {key="4", label="4", brushName="SingleWater", color={0,0,255}},
   {key="5", label="5", brushName="Stone", color=C.Stone},
-  {key="6", label="6", brushName="Seed", color=C.Seed},
+  {key="6", label="6", brushName="Soil", color=C.Soil},
+  {key="7", label="7", brushName="Seed", color=C.Seed},
   -- {key="0", label="0", typeName="ERASER"}, -- this works, and adds eraser to the palette as a normal brush.
 }
 
