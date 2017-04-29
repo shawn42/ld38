@@ -4,7 +4,7 @@ local WIDTH = 800
 local HEIGHT = 600
 local SCALE = 2
 -- local SCALE = 20 -- for viewing the snail
-local ITERATIONS = 2
+local ITERATIONS = 1
 
 local RootModule = require 'modules/gameui'
 -- local RootModule = require 'modules/pixels'
