@@ -88,7 +88,11 @@ end
 
 function Changer:move(src, dest)
   table.insert(self.moves, {src, dest})
-  -- table.insert(self.moves, {src, dest[1],dest[2], src[3],src[4],src[5], src.type})
+end
+
+function Changer:overwrite(src, dest)
+  table.insert(self.clears, dest)
+  table.insert(self.moves, {src, dest})
 end
 
 function Changer:clear(src)
@@ -110,12 +114,25 @@ function Changer:apply(pixgrid)
     src = self.moves[i][1]
     dest = self.moves[i][2]
 
-    idx = 1 + dest[1] + (dest[2]*w)
-    if not did[idx] then
-      -- pixgrid:set(unpack(dest))
+    -- idx = 1 + dest[1] + (dest[2]*w)
+    -- if not did[idx] then
+    --   pixgrid:set(dest[1],dest[2], src[3],src[4],src[5], src.type, src.data)
+    --   pixgrid:clear(src[1],src[2])
+    --   did[idx] = true
+    -- end
+
+    idxd = 1 + dest[1] + (dest[2]*w)
+    idxs = 1 + src[1] + (src[2]*w)
+    if not did[idxd] and not did[idxs] then
+      local dr = dest[3]
+      local dg = dest[4]
+      local db = dest[5]
+      local dtype = dest.type
+      local ddata = dest.data
       pixgrid:set(dest[1],dest[2], src[3],src[4],src[5], src.type, src.data)
-      pixgrid:clear(src[1],src[2])
-      did[idx] = true
+      pixgrid:set(src[1],src[2], dr,dg,db, dtype, ddata)
+      did[idxd] = true
+      did[idxs] = true
     end
   end
 end
