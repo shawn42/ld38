@@ -50,13 +50,13 @@ local brushes = {
 }
 
 local items = {
-  {label="1", brushName="Sand", color=C.Sand},
-  {label="2", brushName="Leaf", color=C.Leaf},
-  {label="3", brushName="Water", color=C.Water},
-  {label="4", brushName="SingleWater", color={0,0,255}},
-  {label="5", brushName="Stone", color=C.Stone},
-  {label="6", brushName="Seed", color=C.Seed},
-  -- {label="0", typeName="ERASER"}, -- this works, and adds eraser to the palette as a normal brush.
+  {key="1", label="1", brushName="Sand", color=C.Sand},
+  {key="2", label="2", brushName="Leaf", color=C.Leaf},
+  {key="3", label="3", brushName="Water", color=C.Water},
+  {key="4", label="4", brushName="SingleWater", color={0,0,255}},
+  {key="5", label="5", brushName="Stone", color=C.Stone},
+  {key="6", label="6", brushName="Seed", color=C.Seed},
+  -- {key="0", label="0", typeName="ERASER"}, -- this works, and adds eraser to the palette as a normal brush.
 }
 
 
@@ -65,8 +65,8 @@ local function newWorld(opts)
     bounds=opts.bounds,
     items=items,
     brushes=brushes,
-    brushName="Sand",
-    eraserName="ERASER",
+    brushName="Sand",    -- as defined in brushes
+    eraserName="ERASER", -- as defined in brushes
   }
   return world
 end
