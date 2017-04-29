@@ -80,13 +80,20 @@ local function leaf(p,pixgrid,changer)
   end
 end
 
-local function takeWater(a,b, amt, satRatio)
-  amt = amt * math.floor(math.min(0,satRatio - (a.water / b.water)) + 0.99999)
-  -- if (b.water <= 0) or (a.water / b.water > satRatio) then return 0 end
-  amt = math.min(amt, a.maxWater-a.water)
-  b.water = math.max(b.water-amt, 0)
-  a.water = a.water + origbw - b.water
-  return amt
+local WaterRates = {
+  [T.Sand] = {
+    [T.Sand] = { rate = 1, equil = 0.9 },
+    [T.Water] = { rate = 2, equil = 100 },  -- theoretically equil could be "inf" but 100 does the trick
+  }
+}
+
+local function absorbWater(p,other)
+  local r = WaterRates[p.type][other.type]
+  if r then
+    local take = math.min(r.rate, math.max(0, 0.5 * (p.data.water + other.data.water) * r.equil - p.data.water), p.data.maxWater - p.data.water)
+    p.data.water = p.data.water + take
+    other.data.water = other.data.water - take
+  end
 end
 
 local function sand(p,pixgrid,changer)
@@ -105,43 +112,17 @@ local function sand(p,pixgrid,changer)
       return
     end
   end
-  local w = p.data.water
-  local maxw = p.data.maxWater
-  if w < maxw then
-    for i=2,6,2 do
-      if isType(Nei,i,T.Water) then
-        local otherd = Nei[i].data
-        otherd.water = otherd.water - 2
-        w = w + 2
-        p.data.water = w
-        if w >= maxw then break end
 
-      elseif isType(Nei,i,T.Sand) then
-        local otherd = Nei[i].data
-        -- slurp water from sand but only if the saturation ratio is low enough
-        if otherd.water > 0 and w / otherd.water < 0.9 then
-          otherd.water = otherd.water - 1
-          w = w + 1
-          p.data.water = w
-          if w >= maxw then break end
-        end
-      end
-    end
-  end
-  local color = C.Sand
-  -- When saturated, turn to Soil?
-  -- if w >= maxw then
-  --   p.type = T.Soil
-  --   color = C.Soil
-  -- end
-  p[3] = math.max(color[1] - w, 130)
-  p[4] = math.max(color[2] - w, 130)
-  p[5] = math.max(color[3] - w, 0)
+  pixgrid:forNeighbors(p, Nei, {Above,Left,Right}, absorbWater)
+
+  p[3] = math.max(C.Sand[1] - p.data.water, 130)
+  p[4] = math.max(C.Sand[2] - p.data.water, 130)
+  p[5] = math.max(C.Sand[3] - p.data.water, 0)
 end
 
 
 local function water(p,pixgrid,changer)
-  if p.data.water <= 0 then
+  if p.data.water < 1 then
     changer:clear(p)
     return
   end

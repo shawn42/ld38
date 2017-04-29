@@ -62,6 +62,14 @@ function Pixgrid:fillNeighbors(p,nei)
   nei[9] = buf[2 + ((py+1) * w) + px] or 0
 end
 
+function Pixgrid:forNeighbors(p,nei,dirs,func)
+  for i=1,#dirs do
+    local other = nei[dirs[i]]
+    if other ~= 0 then func(p,other) end
+  end
+end
+
+
 function Pixgrid:applyBufferAt(buf, xOffset, yOffset)
   for i=1,#buf do
     local p = buf[i]

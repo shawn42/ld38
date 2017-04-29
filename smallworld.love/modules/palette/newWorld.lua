@@ -30,7 +30,7 @@ local brushes = {
     size=5,
     color=C.Water,
     type=T.Water,
-    data={water=200},
+    data={water=100},
   },
   SingleWater = {
     style='pixel',
