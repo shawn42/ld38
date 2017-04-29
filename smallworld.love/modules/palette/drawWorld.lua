@@ -9,7 +9,7 @@ local bh=50
 local spacer=4
 
 local function drawItem(item,x,y,w,h,selected)
-  local color = C[item.typeName] or {255,255,255}
+  local color = item.color or {255,255,255}
   love.graphics.setColor(color)
   love.graphics.rectangle("fill", x+5,y+5, w-10,h-10)
 
@@ -25,7 +25,7 @@ local function drawWorld(world)
   for i=1,#world.items do
     local x = (i-1)*(bw+spacer)
     local y = spacer
-    local selected = (world.brushName == world.items[i].typeName)
+    local selected = (world.brushName == world.items[i].brushName)
     drawItem(world.items[i], x,y,bw,bh, selected)
   end
 end

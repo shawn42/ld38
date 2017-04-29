@@ -45,6 +45,22 @@ function Pixgrid:get(x,y)
   -- 5,1 -> -- 85 == ((80 * 1) + 5) + 1
   return self.buf[1+((y * self.w) + x)]
 end
+function Pixgrid:fillNeighbors(p,nei)
+  -- 1+((y * self.w) + x)
+  local px = p[1]
+  local py = p[2]
+  local buf = self.buf
+  local w = self.w
+  nei[1] = buf[    ((py-1) * w) + px] or 0
+  nei[2] = buf[1 + ((py-1) * w) + px] or 0
+  nei[3] = buf[2 + ((py-1) * w) + px] or 0
+  nei[4] = buf[    (py * w) + px] or 0
+  -- nei[5] = buf[1 + (py * w) + px] or 0
+  nei[6] = buf[2 + (py * w) + px] or 0
+  nei[7] = buf[    ((py+1) * w) + px] or 0
+  nei[8] = buf[1 + ((py+1) * w) + px] or 0
+  nei[9] = buf[2 + ((py+1) * w) + px] or 0
+end
 
 function Pixgrid:applyBufferAt(buf, xOffset, yOffset)
   for i=1,#buf do

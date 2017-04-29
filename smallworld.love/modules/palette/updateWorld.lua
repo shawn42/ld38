@@ -5,7 +5,7 @@ local function updateWorld(world, action)
       for i=1,#world.items do
         local item = world.items[i]
         if action.key == item.label then -- TODO: give item a field to do a cleaner match?
-          world.brushName = item.typeName -- TODO: better symbolic indirection...?
+          world.brushName = item.brushName
         end
       end
     end

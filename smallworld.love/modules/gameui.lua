@@ -46,6 +46,7 @@ M.newWorld = function(opts)
       erase = false,
       x = 0,
       y = 0,
+      count = 0,
     },
   }
   return world
@@ -57,17 +58,20 @@ M.updateWorld = function(world, action)
 
     if world.painter.eraser or world.painter.on then
       -- Generate a "paint" action to the pixworld:
+      local painter = world.painter
       local brush
-      if world.painter.eraser then
+      if painter.eraser then
         brush = world.palette.brushes[world.palette.eraserName] -- mmmmm... is it ok to peek inside another world's state?
       else
         brush = world.palette.brushes[world.palette.brushName] -- mmmmm... is it ok to peek inside another world's state?
+        painter.count = painter.count + 1
       end
       local paintAction = {
         type="paint",
-        x=world.painter.x,
-        y=world.painter.y,
+        x=painter.x,
+        y=painter.y,
         brush=brush,
+        count=painter.count,
       }
       Pixels.updateWorld(world.pixworld, paintAction)
     end
@@ -87,6 +91,7 @@ M.updateWorld = function(world, action)
         world.painter.y = action.y - pixworldB.y
         if action.button == 1 then
           world.painter.on = true
+          world.painter.count = 0
         elseif action.button == 2 then
           world.painter.eraser = true
         end
@@ -104,6 +109,7 @@ M.updateWorld = function(world, action)
     elseif action.state == "released" then
       if action.button == 1 then
         world.painter.on = false
+        world.painter.count = 0
       elseif action.button == 2 then
         world.painter.eraser = false
       end

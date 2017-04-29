@@ -3,44 +3,13 @@ local Pixgrid = require 'pixgrid'
 local Pixtypes = require 'pixtypes'
 local T = Pixtypes.Type
 local Color = Pixtypes.Color
+local Pixbrush = require 'pixbrush'
 
 local automateTheCellular
-local water, waterWithDir, sand, leaf
 local pixtypeUpdaters = {}
 
-local brushStyleFuncs = {
-  squareSpray = function(pixgrid,x,y,brush)
-    for i=1,brush.rate do
-      local x = x + love.math.random(-brush.size, brush.size)
-      local y = y + love.math.random(-brush.size, brush.size)
-      local p = pixgrid:get(x,y)
-      if p and p.type == T.Off then
-        pixgrid:set(x, y, brush.color[1], brush.color[2], brush.color[3], brush.type, brush.data)
-      end
-    end
-  end,
 
-  squareSolid = function(pixgrid,x,y,brush)
-    local s = brush.size
-    local base = - math.floor(s/2)
-    for y2=base, base+s do
-      for x2=base, base+s do
-        pixgrid:set(x+x2, y+y2, brush.color[1], brush.color[2], brush.color[3], brush.type, brush.data)
-      end
-    end
-  end,
-
-  eraser = function(pixgrid,x,y,brush)
-    local s = brush.size
-    local base = - math.floor(s/2)
-    for y2=base, base+s do
-      for x2=base, base+s do
-        pixgrid:clear(x+x2, y+y2)
-      end
-    end
-  end,
-}
-
+local changer = Pixgrid.Changer()
 local function updateWorld(world, action)
   if action.type == "tick" then
     local startTime = love.timer.getTime()
@@ -63,21 +32,31 @@ local function updateWorld(world, action)
     end
 
     if doUpdate then
+      local pixgrid = world.pixgrid
       for i=1,world.iterations do
-        automateTheCellular(world.pixgrid)
+        -- Accumulate pixgrid updates:
+        changer:reset()
+        for i=1,#pixgrid.buf do
+          local p = pixgrid.buf[i]
+          local fn = pixtypeUpdaters[p.type]
+          if fn then fn(p,pixgrid,changer) end
+        end
+        -- Apply accumulated updates to the pixgrid:
+        changer:apply(pixgrid)
       end
     end
+
     Stats.trackUpdateTime(love.timer.getTime() - startTime)
     Stats.trackFPS(love.timer.getFPS())
 
   elseif action.type == 'paint' then
-    local paintFunc = brushStyleFuncs[action.brush.style]
+    local paintFunc = Pixbrush.Styles[action.brush.style]
     if paintFunc then
       local s = world.pixgrid.scale
       local bounds = world.pixgridBounds
       local pgx = math.floor(action.x / s)
       local pgy = math.floor(action.y / s)
-      paintFunc(world.pixgrid, pgx, pgy, action.brush)
+      paintFunc(world.pixgrid, pgx, pgy, action.brush, action.count)
     end
 
   elseif action.type == 'keyboard' then
@@ -96,44 +75,22 @@ local function updateWorld(world, action)
   return world, nil
 end
 
-local changer = Pixgrid.Changer()
-function automateTheCellular(pixgrid)
-  changer:reset()
-
-  for i=1,#pixgrid.buf do
-    local p = pixgrid.buf[i]
-    local fn = pixtypeUpdaters[p.type]
-    if fn then fn(p,pixgrid,changer) end
+local function seed(p,pixgrid,changer)
+  p.data.t = p.data.t + 1
+  local below = pixgrid:get(p[1],p[2]+1)
+  if below then
+    if below.type == T.Off then
+      p.data.t = 0
+      changer:move(p, below)
+    elseif below.type == T.Sand then
+      if p.data.t > 60 then
+        changer:clear(p)
+      end
+    end
   end
-    -- --
-    -- -- SAND
-    -- --
-    -- if p.type == T.Sand then
-    --   sand(p,pixgrid,changer)
-    -- --
-    -- -- LEAF
-    -- --
-    -- elseif p.type == T.Leaf then
-    --   leaf(p,pixgrid,changer)
-    -- --
-    -- -- WATER
-    -- --
-    -- elseif p.type == T.Water then
-    --   water(p,pixgrid,changer)
-    --   -- waterWithDir(p,pixgrid,changer)
-    -- end
-  -- end
-
-  changer:apply(pixgrid)
-
 end
 
-local WDBG = {
-
-}
-
-
-function leaf(p,pixgrid,changer)
+local function leaf(p,pixgrid,changer)
   local below = pixgrid:get(p[1],p[2]+1)
   if below and below.type == T.Off then
     local act = love.math.random(1,4)
@@ -153,7 +110,7 @@ function leaf(p,pixgrid,changer)
   end
 end
 
-function sand(p,pixgrid,changer)
+local function sand(p,pixgrid,changer)
   local above = pixgrid:get(p[1],p[2]-1)
   local below = pixgrid:get(p[1],p[2]+1)
   if below and (below.type == T.Off or below.type == T.Water) then
@@ -173,7 +130,46 @@ function sand(p,pixgrid,changer)
   end
 end
 
-function water(p,pixgrid,changer)
+local AboveLeft = 1
+local Above = 2
+local AboveRight = 3
+local Left = 4
+local Right = 6
+local BelowLeft = 7
+local Below = 8
+local BelowRight = 9
+
+local Nei = {0,0,0,0,0,0,0,0,0}
+
+local function clearNbs(a)
+  for i=1,9 do a[i] = 0 end
+end
+
+local function water2(p,pixgrid,changer)
+  pixgrid:fillNeighbors(p,Nei)
+  if Nei[Below] ~= 0 and Nei[Below].type == T.Off then
+    changer:move(p,Nei[Below])
+    return
+  end
+  if Nei[Left] ~= 0 and Nei[Left].type == T.Off then
+    -- if Nei[BelowLeft] ~= 0 and Nei[BelowLeft] == T.Off then
+    --   changer:move(p,Nei[BelowLeft])
+    --   return
+    -- end
+    changer:move(p,Nei[Left])
+    return
+  end
+  if Nei[Right] ~= 0 and Nei[Right].type == T.Off then
+    -- if Nei[BelowRight] ~= 0 and Nei[BelowRight] == T.Off then
+    --   changer:move(p,Nei[BelowRight])
+    --   return
+    -- end
+    changer:move(p,Nei[Right])
+    return
+  end
+end
+
+local function water(p,pixgrid,changer)
   local below = pixgrid:get(p[1],p[2]+1)
   if below and below.type == T.Off then
     changer:move(p, below)
@@ -214,7 +210,7 @@ function water(p,pixgrid,changer)
   end
 end
 
-function waterWithDir(p,pixgrid,changer)
+local function waterWithDir(p,pixgrid,changer)
   if p.data then
     print("Data!")
   else
@@ -300,5 +296,6 @@ end
 pixtypeUpdaters[T.Sand] = sand
 pixtypeUpdaters[T.Water] = water
 pixtypeUpdaters[T.Leaf] = leaf
+pixtypeUpdaters[T.Seed] = seed
 
 return updateWorld

@@ -5,6 +5,8 @@ local Type = {
   Water = 3,
   Stone = 4,
   Entity = 5,
+  Seed = 6,
+  Grass = 6,
 }
 
 local Color = {
@@ -13,6 +15,8 @@ local Color = {
   Leaf = {150,255,150},
   Water = {100,100,255},
   Stone = {150,150,150},
+  Seed = {255,255,255},
+  Grass = {0,255,0},
 }
 
 
