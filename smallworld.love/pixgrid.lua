@@ -2,7 +2,7 @@ local Pixtypes = require 'pixtypes'
 local T = Pixtypes.Type
 
 local LCS = require 'vendor/LCS'
-
+local M = {}
 local Pixgrid = LCS.class({name = 'Pixgrid'})
 
 function Pixgrid:init(opts)
@@ -137,7 +137,8 @@ function Changer:apply(pixgrid)
   end
 end
 
-Pixgrid.Changer = Changer
-Pixgrid.Types = T
+M.Changer = Changer
+-- M.Types = T
+M.Pixgrid = Pixgrid
 
-return Pixgrid
+return M

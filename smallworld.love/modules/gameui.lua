@@ -24,12 +24,13 @@ M.newWorld = function(opts)
   local palette = Palette.newWorld({
     bounds={x=0, y=0, w=paletteB.w, h=paletteB.h}
   })
-  local pixworld = Pixels.newWorld({
+
+  local normalPixworld = Pixels.newWorld({
     bounds={x=0,y=0, w=pixworldB.w, h=pixworldB.h}, -- pixworld won't internally understand that it's been offset by this outer ui
     iterations=opts.pixels.iterations,
     scale=opts.pixels.scale,
   })
-  -- local pixworld = Pixels.newWorld({
+  -- local closeupPixworld = Pixels.newWorld({
   --   bounds={x=0,y=0, w=pixworldB.w, h=pixworldB.h}, -- pixworld won't internally understand that it's been offset by this outer ui
   --   iterations=opts.pixels.iterations,
   --   scale=20 -- opts.pixels.scale,
@@ -43,7 +44,7 @@ M.newWorld = function(opts)
     layout = layout,
     boxes = boxes,
 
-    pixworld = pixworld,
+    pixworld = normalPixworld,
     palette = palette,
 
     painter = {

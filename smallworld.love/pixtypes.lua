@@ -82,7 +82,7 @@ local function sand(p,pixgrid,changer)
     changer:move(p,Nei[Below])
     return
   end
-  if isType(Nei,Above,T.Sand) then
+  if isType(Nei,Above,T.Sand) or isType(Nei,Above,T.Water) then
     if (love.math.random(0,1) == 1) and Nei[Left] and Nei[Left].type == T.Off then
       changer:move(p, Nei[Left])
       return
@@ -94,14 +94,21 @@ local function sand(p,pixgrid,changer)
   local w = p.data.water
   if w < p.data.maxWater then
     for i=2,6,2 do
-      -- if Nei[i] ~= 0 and Nei[i].data then print(tflatten(Nei[i].data)) end
-      -- if Nei[i] ~= 0 and Nei[i].data and Nei[i].data.water and Nei[i].data.water > 0 then
       if isType(Nei,i,T.Water) then
         local otherd = Nei[i].data
-        otherd.water = otherd.water - 1
-        w = w + 1
+        otherd.water = otherd.water - 2
+        w = w + 2
         p.data.water = w
         if w >= p.data.maxWater then break end
+
+      elseif isType(Nei,i,T.Sand) then
+        local otherd = Nei[i].data
+        if otherd.water > 0 and w / otherd.water < 0.8 then
+          otherd.water = otherd.water - 1
+          w = w + 1
+          p.data.water = w
+          if w >= p.data.maxWater then break end
+        end
       end
     end
   end
