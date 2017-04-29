@@ -1,6 +1,5 @@
 local Pixtypes = require 'pixtypes'
 local T = Pixtypes.Type
-
 local LCS = require 'vendor/LCS'
 local M = {}
 local Pixgrid = LCS.class({name = 'Pixgrid'})
@@ -51,15 +50,15 @@ function Pixgrid:fillNeighbors(p,nei)
   local py = p[2]
   local buf = self.buf
   local w = self.w
-  nei[1] = buf[    ((py-1) * w) + px] or 0
-  nei[2] = buf[1 + ((py-1) * w) + px] or 0
-  nei[3] = buf[2 + ((py-1) * w) + px] or 0
-  nei[4] = buf[    (py * w) + px] or 0
-  -- nei[5] = buf[1 + (py * w) + px] or 0
-  nei[6] = buf[2 + (py * w) + px] or 0
-  nei[7] = buf[    ((py+1) * w) + px] or 0
-  nei[8] = buf[1 + ((py+1) * w) + px] or 0
-  nei[9] = buf[2 + ((py+1) * w) + px] or 0
+  nei[1] = buf[    ((py-1) * w) + px] or 0 -- NW
+  nei[2] = buf[1 + ((py-1) * w) + px] or 0 -- N
+  nei[3] = buf[2 + ((py-1) * w) + px] or 0 -- NE
+  nei[4] = buf[    (py * w) + px] or 0     -- W
+  -- nei[5] = buf[1 + (py * w) + px] or 0  -- point
+  nei[6] = buf[2 + (py * w) + px] or 0     -- E
+  nei[7] = buf[    ((py+1) * w) + px] or 0 -- SW
+  nei[8] = buf[1 + ((py+1) * w) + px] or 0 -- S
+  nei[9] = buf[2 + ((py+1) * w) + px] or 0 -- SE
 end
 
 function Pixgrid:applyBufferAt(buf, xOffset, yOffset)

@@ -7,9 +7,6 @@ local Updaters = Pixtypes.Updaters
 
 local Pixbrush = require 'pixbrush'
 
-local automateTheCellular
-
-
 local changer = Pixgrid.Changer()
 local function updateWorld(world, action)
   if action.type == "tick" then

@@ -93,7 +93,12 @@ local function sand(p,pixgrid,changer)
   end
   local w = p.data.water
   if w < p.data.maxWater then
-    for i=2,6,2 do
+    -- for i=2,6,2 do
+    -- local fullFlowNs = {1,2,3,4,6}
+    local fullFlowNs = {2,4,6}
+    local halfFlowNs = {7,8,9}
+    for ii=1,#fullFlowNs do
+      i = fullFlowNs[ii]
       if isType(Nei,i,T.Water) then
         local otherd = Nei[i].data
         otherd.water = otherd.water - 2
@@ -104,6 +109,25 @@ local function sand(p,pixgrid,changer)
       elseif isType(Nei,i,T.Sand) then
         local otherd = Nei[i].data
         if otherd.water > 0 and w / otherd.water < 0.8 then
+          otherd.water = otherd.water - 1
+          w = w + 1
+          p.data.water = w
+          if w >= p.data.maxWater then break end
+        end
+      end
+    end
+    for ii=1,#halfFlowNs do
+      i = halfFlowNs[ii]
+      if isType(Nei,i,T.Water) then
+        local otherd = Nei[i].data
+        otherd.water = otherd.water - 1
+        w = w + 1
+        p.data.water = w
+        if w >= p.data.maxWater then break end
+
+      elseif isType(Nei,i,T.Sand) then
+        local otherd = Nei[i].data
+        if otherd.water > 0 and w / otherd.water < 0.9 then
           otherd.water = otherd.water - 1
           w = w + 1
           p.data.water = w
