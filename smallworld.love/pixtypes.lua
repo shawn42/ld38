@@ -20,6 +20,7 @@ local C = {
   Water = {100,100,255},
   Stone = {150,150,150},
   Seed = {255,255,255},
+  Soil = {125,92,49},
   Grass = {0,255,0},
 }
 
@@ -91,13 +92,6 @@ local function seed(p,pixgrid,changer)
 
     return
   end
-<<<<<<< HEAD
-  if not isType(Nei, Below, T.Sand) then
-    p.data.t = p.data.t + 1
-    if p.data.t > 60 then
-      changer:clear(p)
-    end
-=======
   if nei[Below].type == T.Off then
     p.data.t = 0
     changer:move(p, nei[Below])
@@ -107,7 +101,6 @@ local function seed(p,pixgrid,changer)
   p.data.t = p.data.t + 1
   if p.data.t > 60 then
     changer:clear(p)
->>>>>>> cb929791cab4aa670781634d7df451851c2eecb2
   end
 end
 
@@ -136,10 +129,6 @@ local function leaf(p,pixgrid,changer)
   end
 end
 
-<<<<<<< HEAD
-=======
-
->>>>>>> cb929791cab4aa670781634d7df451851c2eecb2
 local function sand(p,pixgrid,changer)
   local nei = pixgrid:getNeighbors(p)
   if nei[Below].type == T.Off or nei[Below].type == T.Water then
@@ -155,71 +144,6 @@ local function sand(p,pixgrid,changer)
       return
     end
   end
-<<<<<<< HEAD
-  local w = p.data.water
-  if w < p.data.maxWater then
-    -- for i=2,6,2 do
-    -- local fullFlowNs = {1,2,3,4,6}
-    local fullFlowNs = {2,4,6}
-    local halfFlowNs = {7,8,9}
-    for ii=1,#fullFlowNs do
-      i = fullFlowNs[ii]
-      if isType(Nei,i,T.Water) then
-        local otherd = Nei[i].data
-        otherd.water = otherd.water - 2
-        w = w + 2
-        p.data.water = w
-        if w >= p.data.maxWater then break end
-
-      elseif isType(Nei,i,T.Sand) then
-        local otherd = Nei[i].data
-        if otherd.water > 0 and w / otherd.water < 0.8 then
-          otherd.water = otherd.water - 1
-          w = w + 1
-          p.data.water = w
-          if w >= p.data.maxWater then break end
-        end
-      end
-    end
-    for ii=1,#halfFlowNs do
-      i = halfFlowNs[ii]
-      if isType(Nei,i,T.Water) then
-        local otherd = Nei[i].data
-        otherd.water = otherd.water - 1
-        w = w + 1
-        p.data.water = w
-        if w >= p.data.maxWater then break end
-
-      elseif isType(Nei,i,T.Sand) then
-        local otherd = Nei[i].data
-        if otherd.water > 0 and w / otherd.water < 0.9 then
-          otherd.water = otherd.water - 1
-          w = w + 1
-          p.data.water = w
-          if w >= p.data.maxWater then break end
-        end
-      end
-    end
-  end
-  p[3] = math.max(C.Sand[1] - w, 130)
-  p[4] = math.max(C.Sand[2] - w, 130)
-  p[5] = math.max(C.Sand[3] - w, 0)
-  -- if isType(Nei,Above,T.Water) then
-  --   Nei[Above].data.water = Nei[Above].data.water - 1
-  --   p.data.water = p.data.water + 1
-  -- end
-  -- if isType(Nei,Left,T.Water) then
-  --   Nei[Left].data.water = Nei[Left].data.water - 1
-  --   p.data.water = p.data.water + 1
-  -- end
-  -- if isType(Nei,Right,T.Water) then
-  --   Nei[Right].data.water = Nei[Right].data.water - 1
-  --   p.data.water = p.data.water + 1
-  -- end
-  -- p[3] = math.max(p[3] - 1, 130)
-  -- p[4] = math.max(p[4] - 1, 130)
-  -- p[5] = math.max(p[5] - 1, 0)
-=======
 
   absorbWater(p, nei[AboveLeft])
   absorbWater(p, nei[Above])
@@ -230,7 +154,6 @@ local function sand(p,pixgrid,changer)
   p[3] = math.max(C.Sand[1] - p.data.water, 130)
   p[4] = math.max(C.Sand[2] - p.data.water, 130)
   p[5] = math.max(C.Sand[3] - p.data.water, 0)
->>>>>>> cb929791cab4aa670781634d7df451851c2eecb2
 end
 
 
@@ -262,8 +185,6 @@ local function water(p,pixgrid,changer)
   end
 end
 
-<<<<<<< HEAD
-=======
 local function soil(p,pixgrid,changer)
   local nei = pixgrid:getNeighbors(p,nei)
   if nei[Below].type == T.Off or nei[Below].type == T.Water then
@@ -301,17 +222,13 @@ local function grass(p,pixgrid,changer)
                 T.Grass, {life=0, maxLife=120})
   end
 end
->>>>>>> cb929791cab4aa670781634d7df451851c2eecb2
 
 PT.Updaters = {}
 PT.Updaters[T.Sand] = sand
 PT.Updaters[T.Water] = water
 PT.Updaters[T.Leaf] = leaf
 PT.Updaters[T.Seed] = seed
-<<<<<<< HEAD
-=======
 PT.Updaters[T.Soil] = soil
 PT.Updaters[T.Grass] = grass
->>>>>>> cb929791cab4aa670781634d7df451851c2eecb2
 
 return PT
