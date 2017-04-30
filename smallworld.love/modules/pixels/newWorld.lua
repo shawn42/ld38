@@ -25,13 +25,6 @@ local function newWorld(opts)
     h=world.bounds.h / scale,
     scale=scale,
   })
-  print(tostring(#world.pixgrid.buf))
-  -- world.pixgrid = Pixgrid.Pixgrid({
-  --   w=world.bounds.w / scale,
-  --   h=world.bounds.h / scale,
-  --   scale=scale,
-  -- })
-
 
   if opts.pixeldata then
     world.pixgrid:setBuffer(opts.pixeldata)
