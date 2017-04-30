@@ -53,9 +53,12 @@ function Pixgrid:get(x,y)
   -- 5,1 -> -- 85 == ((80 * 1) + 5) + 1
   return self.buf[1+((y * self.w) + x)]
 end
+
 local NaP = {-1,-1, 0,0,0, T.NaP, {}}
-function Pixgrid:fillNeighbors(p,nei)
-  -- 1+((y * self.w) + x)
+
+
+function Pixgrid:getNeighbors(p)
+  local nei = {Nap, Nap, Nap, Nap, Nap, Nap, Nap, Nap, Nap}
   local px = p[1]
   local py = p[2]
   local buf = self.buf
@@ -69,15 +72,8 @@ function Pixgrid:fillNeighbors(p,nei)
   nei[7] = buf[    ((py+1) * w) + px] or NaP
   nei[8] = buf[1 + ((py+1) * w) + px] or NaP
   nei[9] = buf[2 + ((py+1) * w) + px] or NaP
+  return nei
 end
-
-function Pixgrid:forNeighbors(p,nei,dirs,func)
-  for i=1,#dirs do
-    local other = nei[dirs[i]]
-    if other ~= 0 then func(p,other) end
-  end
-end
-
 
 function Pixgrid:applyBufferAt(buf, xOffset, yOffset)
   for i=1,#buf do
