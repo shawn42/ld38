@@ -1,6 +1,7 @@
 local PT = {}
 
 local T = {
+  NaP = -1,
   Off = 0,
   Sand = 1,
   Leaf = 2,
@@ -39,7 +40,7 @@ local Nei = {0,0,0,0,0,0,0,0,0}
 -- local function clearNbs(a) for i=1,9 do a[i] = 0 end end -- haven't needed this yet
 
 local function isType(nei, i, type)
-  return nei[i] ~= 0 and nei[i].type == type
+  return nei[i].type == type
 end
 
 local function seed(p,pixgrid,changer)
