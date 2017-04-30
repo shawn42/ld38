@@ -120,6 +120,20 @@ local function leaf(p,pixgrid,changer)
     else
       changer:move(p, nei[Below])
     end
+
+  else
+    p.data.life = p.data.life - math.random(0,0.4)
+    if p.data.life <= 0 then
+      if math.random(1,10) == 1 then
+        pixgrid:set(p[1],p[2],
+                    C.Seed[1],C.Seed[2],C.Seed[3],
+                    T.Seed, {t=0, water=0, maxWater=50})
+      else
+        pixgrid:set(p[1],p[2],
+                    C.Soil[1],C.Soil[2],C.Soil[3],
+                    T.Soil, {water=100,maxWater=100})
+      end
+    end
   end
 end
 
@@ -193,13 +207,13 @@ local function grass(p,pixgrid,changer)
   if nei[Below].type == T.Off or nei[Below].type == T.Water then
     pixgrid:set(p[1],p[2],
                 C.Leaf[1], C.Leaf[2], C.Leaf[3],
-                T.Leaf, nil)
+                T.Leaf, {life=100})
     return
   end
 
   absorbLife(p, nei[Below])
 
-  if p.data.life > 30 and nei[Above].type == T.Off then
+  if p.data.life > 30 then -- and nei[Above].type == T.Off then
     pixgrid:set(nei[Above][1], nei[Above][2],
                 C.Grass[1], C.Grass[2], C.Grass[3],
                 T.Grass, {life=0, maxLife=120})

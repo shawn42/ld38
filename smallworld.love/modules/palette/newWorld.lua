@@ -23,6 +23,7 @@ local brushes = {
     size=10,
     color=C.Leaf,
     type=T.Leaf,
+    data={life=100},
   },
   Water = {
     style='squareSpray',
