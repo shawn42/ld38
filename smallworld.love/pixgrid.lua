@@ -1,11 +1,19 @@
 local Pixtypes = require 'pixtypes'
 local T = Pixtypes.Type
 
-local LCS = require 'vendor/LCS'
 local M = {}
-local Pixgrid = LCS.class({name = 'Pixgrid'})
 
-function Pixgrid:init(opts)
+local Pixgrid = {}
+
+function Pixgrid:new(opts)
+  local obj = {}
+  setmetatable(obj, self)
+  self.__index = self
+  obj:setup(opts)
+  return obj
+end
+
+function Pixgrid:setup(opts)
   self.w = opts.w
   self.h = opts.h
   self.buf = {}
@@ -15,7 +23,7 @@ function Pixgrid:init(opts)
     for c=0,self.w-1 do
       local pixel = {c,r, 0,0,0}
       pixel.type = 0 -- Pixtypes.Types.Off
-      table.insert(self.buf, pixel)
+      self.buf[#self.buf+1] = pixel
     end
   end
 end
@@ -82,10 +90,14 @@ function Pixgrid:applyBufferAt(buf, xOffset, yOffset)
   end
 end
 
-local Changer = LCS.class({name = 'Changer'})
+local Changer = {}
 
-function Changer:init()
-  self:reset()
+function Changer:new()
+  local obj = {}
+  setmetatable(obj, self)
+  self.__index = self
+  obj:reset()
+  return obj
 end
 
 function Changer:reset()

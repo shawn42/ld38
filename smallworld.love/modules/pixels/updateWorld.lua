@@ -10,7 +10,7 @@ local Pixbrush = require 'pixbrush'
 local automateTheCellular
 
 
-local changer = Pixgrid.Changer()
+local changer = Pixgrid.Changer:new()
 local function updateWorld(world, action)
   if action.type == "tick" then
     local startTime = love.timer.getTime()
