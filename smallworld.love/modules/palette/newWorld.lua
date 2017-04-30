@@ -50,13 +50,13 @@ local brushes = {
     size=3,
     color=C.Soil,
     type=T.Soil,
-    data={},
+    data={water=100,maxWater=100},
   },
   Seed = {
     style='pixel',
     color=C.Seed,
     type=T.Seed,
-    data={t=0},
+    data={t=0, water=0,maxWater=50},
   },
 }
 

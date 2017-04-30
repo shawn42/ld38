@@ -32,6 +32,7 @@ M.newWorld = function(opts)
       iterations=opts.pixels.iterations,
       scale=opts.pixels.scale,
     }),
+
     -- Zoomed-in giant pixel world:
     ["2"] = Pixels.newWorld({
       bounds={x=0,y=0, w=pixworldB.w, h=pixworldB.h}, -- pixworld won't internally understand that it's been offset by this outer ui
@@ -49,7 +50,7 @@ M.newWorld = function(opts)
     boxes = boxes,
 
     worlds = worlds,
-    pixworld = worlds["1"],
+    pixworld = worlds["2"],
 
     palette = palette,
 
