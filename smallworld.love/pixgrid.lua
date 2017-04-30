@@ -1,10 +1,18 @@
 local Pixtypes = require 'pixtypes'
 local T = Pixtypes.Type
-local LCS = require 'vendor/LCS'
 local M = {}
-local Pixgrid = LCS.class({name = 'Pixgrid'})
 
-function Pixgrid:init(opts)
+local Pixgrid = {}
+
+function Pixgrid:new(opts)
+  local obj = {}
+  setmetatable(obj, self)
+  self.__index = self
+  obj:setup(opts)
+  return obj
+end
+
+function Pixgrid:setup(opts)
   self.w = opts.w
   self.h = opts.h
   self.buf = {}
@@ -14,7 +22,7 @@ function Pixgrid:init(opts)
     for c=0,self.w-1 do
       local pixel = {c,r, 0,0,0}
       pixel.type = 0 -- Pixtypes.Types.Off
-      table.insert(self.buf, pixel)
+      self.buf[#self.buf+1] = pixel
     end
   end
 end
@@ -44,12 +52,17 @@ function Pixgrid:get(x,y)
   -- 5,1 -> -- 85 == ((80 * 1) + 5) + 1
   return self.buf[1+((y * self.w) + x)]
 end
-function Pixgrid:fillNeighbors(p,nei)
-  -- 1+((y * self.w) + x)
+
+local NaP = {-1,-1, 0,0,0, T.NaP, {}}
+
+
+function Pixgrid:getNeighbors(p)
+  local nei = {Nap, Nap, Nap, Nap, Nap, Nap, Nap, Nap, Nap}
   local px = p[1]
   local py = p[2]
   local buf = self.buf
   local w = self.w
+<<<<<<< HEAD
   nei[1] = buf[    ((py-1) * w) + px] or 0 -- NW
   nei[2] = buf[1 + ((py-1) * w) + px] or 0 -- N
   nei[3] = buf[2 + ((py-1) * w) + px] or 0 -- NE
@@ -59,6 +72,18 @@ function Pixgrid:fillNeighbors(p,nei)
   nei[7] = buf[    ((py+1) * w) + px] or 0 -- SW
   nei[8] = buf[1 + ((py+1) * w) + px] or 0 -- S
   nei[9] = buf[2 + ((py+1) * w) + px] or 0 -- SE
+=======
+  nei[1] = buf[    ((py-1) * w) + px] or NaP
+  nei[2] = buf[1 + ((py-1) * w) + px] or NaP
+  nei[3] = buf[2 + ((py-1) * w) + px] or NaP
+  nei[4] = buf[    (py * w) + px] or NaP
+  -- nei[5] = buf[1 + (py * w) + px] or NaP
+  nei[6] = buf[2 + (py * w) + px] or NaP
+  nei[7] = buf[    ((py+1) * w) + px] or NaP
+  nei[8] = buf[1 + ((py+1) * w) + px] or NaP
+  nei[9] = buf[2 + ((py+1) * w) + px] or NaP
+  return nei
+>>>>>>> cb929791cab4aa670781634d7df451851c2eecb2
 end
 
 function Pixgrid:applyBufferAt(buf, xOffset, yOffset)
@@ -73,10 +98,14 @@ function Pixgrid:applyBufferAt(buf, xOffset, yOffset)
   end
 end
 
-local Changer = LCS.class({name = 'Changer'})
+local Changer = {}
 
-function Changer:init()
-  self:reset()
+function Changer:new()
+  local obj = {}
+  setmetatable(obj, self)
+  self.__index = self
+  obj:reset()
+  return obj
 end
 
 function Changer:reset()

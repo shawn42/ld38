@@ -25,16 +25,21 @@ M.newWorld = function(opts)
     bounds={x=0, y=0, w=paletteB.w, h=paletteB.h}
   })
 
-  local normalPixworld = Pixels.newWorld({
-    bounds={x=0,y=0, w=pixworldB.w, h=pixworldB.h}, -- pixworld won't internally understand that it's been offset by this outer ui
-    iterations=opts.pixels.iterations,
-    scale=opts.pixels.scale,
-  })
-  -- local closeupPixworld = Pixels.newWorld({
-  --   bounds={x=0,y=0, w=pixworldB.w, h=pixworldB.h}, -- pixworld won't internally understand that it's been offset by this outer ui
-  --   iterations=opts.pixels.iterations,
-  --   scale=20 -- opts.pixels.scale,
-  -- })
+  local worlds = {
+    -- Normal 2x world:
+    ["1"] = Pixels.newWorld({
+      bounds={x=0,y=0, w=pixworldB.w, h=pixworldB.h}, -- pixworld won't internally understand that it's been offset by this outer ui
+      iterations=opts.pixels.iterations,
+      scale=opts.pixels.scale,
+    }),
+
+    -- Zoomed-in giant pixel world:
+    ["2"] = Pixels.newWorld({
+      bounds={x=0,y=0, w=pixworldB.w, h=pixworldB.h}, -- pixworld won't internally understand that it's been offset by this outer ui
+      iterations=opts.pixels.iterations,
+      scale=20 -- opts.pixels.scale,
+    }),
+  }
 
   -- WORLD
   local world = {
@@ -44,7 +49,9 @@ M.newWorld = function(opts)
     layout = layout,
     boxes = boxes,
 
-    pixworld = normalPixworld,
+    worlds = worlds,
+    pixworld = worlds["2"],
+
     palette = palette,
 
     painter = {
@@ -53,6 +60,9 @@ M.newWorld = function(opts)
       x = 0,
       y = 0,
       count = 0,
+    },
+    kbd = {
+      cmd = false,
     },
   }
   return world
@@ -119,24 +129,22 @@ M.updateWorld = function(world, action)
       elseif action.button == 2 then
         world.painter.eraser = false
       end
-
-      -- FIXME: needed anymore?
-      -- iterate the items in world.layout and deliver a properly offset mouse released action:
-      -- for i=1,#world.layout do
-      --   local bounds,module,name = unpack(world.layout[i])
-      --   local x = action.x
-      --   local y = action.y
-      --   action.x = x - bounds.x
-      --   action.y = y - bounds.y
-      --   module.updateWorld(world[name], action)
-      --   action.x = x
-      --   action.y = y
-      -- end
     end
 
   elseif action.type == "keyboard" then
-    Palette.updateWorld(world.palette, action)
-    Pixels.updateWorld(world.pixworld, action)
+    -- print(tflatten(action))
+    if action.key == "lgui" or action.key == "rgui" then
+      world.kbd.cmd = (action.state == "pressed")
+    end
+    if world.kbd.cmd then
+      local nextworld = world.worlds[action.key]
+      if nextworld then
+        world.pixworld = nextworld
+      end
+    else
+      Palette.updateWorld(world.palette, action)
+      Pixels.updateWorld(world.pixworld, action)
+    end
   end
 
   return world, nil

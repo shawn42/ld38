@@ -23,6 +23,7 @@ local brushes = {
     size=10,
     color=C.Leaf,
     type=T.Leaf,
+    data={life=100},
   },
   Water = {
     style='squareSpray',
@@ -44,11 +45,19 @@ local brushes = {
     color=C.Stone,
     type=T.Stone,
   },
+  Soil = {
+    style='squareSpray',
+    rate=6,
+    size=3,
+    color=C.Soil,
+    type=T.Soil,
+    data={water=100,maxWater=100},
+  },
   Seed = {
     style='pixel',
     color=C.Seed,
     type=T.Seed,
-    data={t=0},
+    data={t=0, water=0,maxWater=50},
   },
 }
 

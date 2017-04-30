@@ -20,7 +20,7 @@ local function newWorld(opts)
   }
 
   local scale = opts.scale or 1
-  world.pixgrid = Pixgrid.Pixgrid({
+  world.pixgrid = Pixgrid.Pixgrid:new({
     w=world.bounds.w / scale,
     h=world.bounds.h / scale,
     scale=scale,
