@@ -110,7 +110,7 @@ local function leaf(p,pixgrid,changer)
   local nei = pixgrid:getNeighbors(p)
   if nei[Below].type == T.Off or nei[Below].type == T.Water then
     local dir = leafMoves[math.random(1,4)]
-    if nei[dir].type == T.Off then
+    if nei[dir].type == T.Off or nei[dir].type == T.Water then
       changer:move(p, nei[dir])
     end
   else
@@ -190,6 +190,18 @@ local function soil(p,pixgrid,changer)
   local nei = pixgrid:getNeighbors(p,nei)
   if nei[Below].type == T.Off or nei[Below].type == T.Water then
     changer:move(p, nei[Below])
+    return
+  end
+  if nei[Left].type == T.Off and nei[Above].type ~= T.Off then
+    local twoUp = pixgrid:get(p[1],p[2]-2)
+    if twoUp.type ~= T.Off then
+      changer:move(p, nei[Left])
+    end
+  elseif nei[Right].type == T.Off and nei[Above].type ~= T.Off then
+    local twoUp = pixgrid:get(p[1],p[2]-2)
+    if twoUp.type ~= T.Off then
+      changer:move(p, nei[Right])
+    end
   end
 end
 
