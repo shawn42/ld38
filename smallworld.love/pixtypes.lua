@@ -104,23 +104,15 @@ local function seed(p,pixgrid,changer)
   end
 end
 
+local leafMoves = {Left,Right,Below,Below}
+
 local function leaf(p,pixgrid,changer)
   local nei = pixgrid:getNeighbors(p)
   if nei[Below].type == T.Off or nei[Below].type == T.Water then
-    local act = love.math.random(1,4)
-    if act == 1 then
-      if nei[Left].type == T.Off then
-        changer:move(p, nei[Left])
-      end
-    elseif act == 2 then
-      if nei[Right].type == T.Off then
-        changer:move(p, nei[Right])
-        return
-      end
-    else
-      changer:move(p, nei[Below])
+    local dir = leafMoves[math.random(1,4)]
+    if nei[dir].type == T.Off then
+      changer:move(p, nei[dir])
     end
-
   else
     p.data.life = p.data.life - math.random(0,0.4)
     if p.data.life <= 0 then
