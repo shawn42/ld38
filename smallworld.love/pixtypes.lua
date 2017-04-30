@@ -113,7 +113,7 @@ local function sand(p,pixgrid,changer)
     end
   end
 
-  pixgrid:forNeighbors(p, Nei, {Above,Left,Right}, absorbWater)
+  pixgrid:forNeighbors(p, Nei, {AboveLeft,Above,AboveRight,Left,Right}, absorbWater)
 
   p[3] = math.max(C.Sand[1] - p.data.water, 130)
   p[4] = math.max(C.Sand[2] - p.data.water, 130)
