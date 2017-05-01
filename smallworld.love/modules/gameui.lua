@@ -64,6 +64,12 @@ M.newWorld = function(opts)
     kbd = {
       cmd = false,
     },
+    timectrl = {
+      interval = 1,  -- how often (in ticks, not time) to actually perform the update
+      tickcounter = 0,
+      stepwise = false,
+      stepped = false,
+    },
   }
   return world
 end
@@ -71,6 +77,7 @@ end
 M.updateWorld = function(world, action)
   if action.type == "tick" then
     local startTime = love.timer.getTime()
+
 
     if world.painter.eraser or world.painter.on then
       -- Generate a "paint" action to the pixworld:
@@ -92,9 +99,28 @@ M.updateWorld = function(world, action)
       Pixels.updateWorld(world.pixworld, paintAction)
     end
 
+    local tc = world.timectrl
+    local doUpdate = false
+    if tc.stepwise then
+      -- User must kick the simulation along by hitting a key
+      if tc.stepped then
+        doUpdate = true
+        tc.stepped = false
+      end
+    else
+      tc.tickcounter = tc.tickcounter + 1
+      if tc.tickcounter >= tc.interval then -- in ticks, not time
+        -- Rate-controlled:
+        tc.tickcounter = 0
+        doUpdate = true
+      end
+    end
+
     -- Forward the tick event to subworlds:
-    Pixels.updateWorld(world.pixworld, action)
-    Palette.updateWorld(world.palette, action)
+    if doUpdate then
+      Pixels.updateWorld(world.pixworld, action)
+      Palette.updateWorld(world.palette, action)
+    end
 
     Stats.trackUpdateTime(love.timer.getTime() - startTime)
     Stats.trackFPS(love.timer.getFPS())
@@ -132,16 +158,25 @@ M.updateWorld = function(world, action)
     end
 
   elseif action.type == "keyboard" then
-    -- print(tflatten(action))
+    -- Track CMD modifier up or down:
     if action.key == "lgui" or action.key == "rgui" then
       world.kbd.cmd = (action.state == "pressed")
     end
     if world.kbd.cmd then
+      -- World-switching:
       local nextworld = world.worlds[action.key]
       if nextworld then
         world.pixworld = nextworld
       end
     else
+      -- Stepwise on/off:
+      if action.key == 's' and action.state == "pressed" then
+        world.timectrl.stepwise = not world.timectrl.stepwise
+      elseif action.key == 'space' then
+        world.timectrl.stepped = true
+      end
+
+      -- Pass the key down to the subworlds:
       Palette.updateWorld(world.palette, action)
       Pixels.updateWorld(world.pixworld, action)
     end

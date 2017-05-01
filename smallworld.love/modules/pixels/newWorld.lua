@@ -9,12 +9,6 @@ local function newWorld(opts)
   local bounds = opts.bounds
   local world = {
     iterations=opts.iterations,
-    timectrl = {
-      interval = 1,  -- how often (in ticks, not time) to actually perform the update
-      tickcounter = 0,
-      stepwise = false,
-      stepped = false,
-    },
     bounds = bounds,
     bgcolor = {0,0,50},
   }
