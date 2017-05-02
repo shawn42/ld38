@@ -50,7 +50,7 @@ M.newWorld = function(opts)
     boxes = boxes,
 
     worlds = worlds,
-    pixworld = worlds["2"],
+    pixworld = worlds["1"],
 
     palette = palette,
 
