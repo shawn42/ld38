@@ -1,5 +1,5 @@
 local Stats = require 'stats'
-local Pixels = require 'modules/pixels'
+local Pixels = require 'modules/pixels-ecs'
 local Palette = require 'modules/palette'
 
 
@@ -11,10 +11,10 @@ M.newWorld = function(opts)
   -- LAYOUT
   local paletteB = {x=150, y=bounds.y, w=bounds.w-150, h=60}
   local pixworldB = {x=0, y=bounds.y+paletteB.h, w=bounds.w, h=bounds.h-paletteB.h}
-  local layout = {
-    {pixworldB, Pixels, "pixworld"},
-    {paletteB, Palette, "palette"},
-  }
+  -- local layout = {
+  --   {pixworldB, Pixels, "pixworld"},
+  --   {paletteB, Palette, "palette"},
+  -- }
   local boxes = {
     pixworld=pixworldB,
     palette=paletteB,
@@ -46,7 +46,7 @@ M.newWorld = function(opts)
     bgcolor = {0,0,100},
     bounds = bounds,
 
-    layout = layout,
+    -- layout = layout,
     boxes = boxes,
 
     worlds = worlds,

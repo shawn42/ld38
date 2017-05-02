@@ -18,8 +18,6 @@ Comp.define("sprite", {'spriteId','','frame','','offx',0,'offy',0,'sx',1,'sy',1,
 
 Comp.define("label", {'text','Label', 'color', {0,0,0},'font',nil, 'width', nil, 'align',nil, 'height',nil,'valign',nil})
 
-Comp.define("iconAdder", {'imgId', '', 'tagName', ''})
-
 Comp.define("circle", {'offx',0,'offy',0,'radius',0, 'color',{0,0,0}})
 Comp.define("rect", {'offx',0,'offy',0,'w',0, 'h',0, 'color',{0,0,0}, 'style','fill'})
 
