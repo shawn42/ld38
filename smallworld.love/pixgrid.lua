@@ -77,12 +77,9 @@ end
 function Pixgrid:applyBufferAt(buf, xOffset, yOffset)
   for i=1,#buf do
     local p = buf[i]
-    local x = p[1] + xOffset
-    local y = p[2] + yOffset
-
-    local t = p.type
-    if t ~= T.Off then t = T.Entity end -- quick fix, avoids the poor snail's shell from crumbling
-    self:set(x,y, p[3],p[4],p[5],t,p.data)
+    if p.type ~= T.Off then
+      self:set(p[1]+xOffset,p[2]+yOffset,p[3],p[4],p[5],T.Entity,p.data)
+    end
   end
 end
 
@@ -92,6 +89,7 @@ function Changer:new()
   local obj = {}
   setmetatable(obj, self)
   self.__index = self
+
   obj:reset()
   return obj
 end

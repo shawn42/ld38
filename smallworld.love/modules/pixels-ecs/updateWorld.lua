@@ -3,6 +3,7 @@ local Pixgrid = require 'pixgrid'
 local Pixtypes = require 'pixtypes'
 local Pixbrush = require 'pixbrush'
 local Updaters = Pixtypes.Updaters
+local Helpers = require 'modules.pixels-ecs.helpers'
 
 -- Function to update the Pixgrid
 local changer = Pixgrid.Changer:new()
@@ -21,8 +22,13 @@ local function updatePixgrid(pixgrid, iterations)
 end
 
 -- System to update the pixgrid
-local pixgridSystem = defineUpdateSystem(hasComps('pixgrid'), function(e,estore,input,res)
-    updatePixgrid(e.pixgrid.pixgrid, 1)
+local pixgridSystem = defineUpdateSystem(hasComps('pixgrid'), function(ge,estore,input,res)
+    local pixgrid = ge.pixgrid.pixgrid
+    estore:walkEntities(hasComps('pixbuf'), function(be)
+      local x,y = getPos(be)
+      pixgrid:applyBufferAt(be.pixbuf.buffer, x, y)
+    end)
+    updatePixgrid(pixgrid, 1)
 end)
 
 -- System to apply paint event to the pixgrid
@@ -39,6 +45,15 @@ local paintSystem = defineUpdateSystem(hasComps('pixgrid'), function(e,estore,in
   end
 end)
 
+-- local getPixgrid = Helpers.getPixgrid
+-- local pixbufSystem = function(estore,input,res)
+--   local pixgrid = getPixgrid(estore)
+--   estore:walkEntities(hasComps('pixbuf'), function(e)
+--     local x,y = getPos(e)
+--     pixgrid:applyBufferAt(e.pixbuf.buffer, x, y)
+--   end)
+-- end
+
 -- "static" resources accessible to systems:
 local Res = { pixbrushStyles = Pixbrush.Styles }
 
@@ -48,6 +63,7 @@ local Res = { pixbrushStyles = Pixbrush.Styles }
 local function updateWorld(world, action)
   if action.type == "tick" then
     pixgridSystem(world.estore, world.input, {})
+    -- pixbufSystem(world.estore, world.input, {})
     world.input = {}
 
   elseif action.type == 'paint' then

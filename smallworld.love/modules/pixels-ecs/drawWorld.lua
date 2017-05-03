@@ -1,12 +1,10 @@
+local Helpers = require 'modules.pixels-ecs.helpers'
 local Stats = require 'stats'
 
+
+local getPixgrid = Helpers.getPixgrid
 local function drawWorld(world)
-
-  local pixgrid
-  world.estore:seekEntity(hasComps('pixgrid'), function(e)
-    pixgrid = e.pixgrid.pixgrid
-  end)
-
+  local pixgrid = getPixgrid(world.estore)
   if pixgrid then
     love.graphics.setColor(255,255,255)
     love.graphics.push()
