@@ -2,6 +2,7 @@ local Pixgrid = require 'pixgrid'
 local Pixtypes = require 'pixtypes'
 local T = Pixtypes.Type
 local Color = Pixtypes.Color
+local Resources = require 'modules.pixels-ecs.resources'
 
 local Estore = require 'ecs/estore'
 require 'comps'
@@ -9,6 +10,7 @@ require 'comps'
 local Comp = require 'ecs/component'
 Comp.define('pixgrid', {'pixgrid',{}})
 Comp.define('pixbuf', {'buffer',{}})
+Comp.define('script', {'script',''})
 
 local function newWorld(opts)
   local bounds = opts.bounds
@@ -32,15 +34,18 @@ local function newWorld(opts)
   local snailBuf = love.filesystem.load('data/snail.lua')()
   estore:newEntity({
     {'name', {name='Snail'}},
-    {'pos',{x=100,y=100}},
+    {'pos',{x=30,y=220}},
     {'bounds',{offx=0,offy=0, w=20, h=20}},
     {'pixbuf', {buffer=snailBuf}},
+    {'script', {script='crawl'}},
   -- local snailBuf = love.filesystem.load('data/snail.lua')()
   -- pixgrid:applyBufferAt(snailBuf, 100,100)
   })
 
   world.estore = estore
   world.input = {}
+
+  world.resources = Resources.load()
 
   -- world.pixgrid = pixgrid
 

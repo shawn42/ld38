@@ -29,3 +29,5 @@ Comp.define("debug", {'value',''})
 
 Comp.define("map",{'id',''})
 Comp.define("collidable", {})
+
+Comp.define('script',{'script',''})
