@@ -83,6 +83,7 @@ function Pixgrid:applyBufferAt(buf, xOffset, yOffset)
   end
 end
 
+
 local Changer = {}
 
 function Changer:new()
@@ -95,7 +96,7 @@ function Changer:new()
 end
 
 function Changer:reset()
-  -- self.sets = {}
+  self.sets = {}
   self.clears = {}
   self.moves = {}
 end
@@ -113,28 +114,35 @@ function Changer:clear(src)
   table.insert(self.clears, src)
 end
 
+function Changer:setPixlist(list, xOffset, yOffset)
+  for i=1,#list do
+    local p = list[i]
+    table.insert(self.sets, {p[1]+xOffset,p[2]+yOffset,p[3],p[4],p[5],T.Entity,p.data})
+  end
+end
+
+function Changer:movePixlist(list, lastx, lasty, xOffset, yOffset)
+  for i=1,#list do
+    local p = list[i]
+    table.insert(self.clears, {p[1]+lastx, p[2]+lasty})
+    table.insert(self.sets,{p[1]+xOffset, p[2]+yOffset,p[3],p[4],p[5],T.Entity,p.data})
+  end
+end
+
 function Changer:apply(pixgrid)
   for i=1,#self.clears do
     pixgrid:clear(self.clears[i][1], self.clears[i][2])
   end
 
-  -- for i=1,#sets do
-  --   pixgrid:set(unpack(v))
-  -- end
+  for i=1,#self.sets do
+    pixgrid:set(unpack(self.sets[i]))
+  end
 
   local did = {}
   local w = pixgrid.w
   for i=1,#self.moves do
     src = self.moves[i][1]
     dest = self.moves[i][2]
-
-    -- idx = 1 + dest[1] + (dest[2]*w)
-    -- if not did[idx] then
-    --   pixgrid:set(dest[1],dest[2], src[3],src[4],src[5], src.type, src.data)
-    --   pixgrid:clear(src[1],src[2])
-    --   did[idx] = true
-    -- end
-
     idxd = 1 + dest[1] + (dest[2]*w)
     idxs = 1 + src[1] + (src[2]*w)
     if not did[idxd] and not did[idxs] then

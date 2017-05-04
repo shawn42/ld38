@@ -9,8 +9,20 @@ require 'comps'
 
 local Comp = require 'ecs/component'
 Comp.define('pixgrid', {'pixgrid',{}})
-Comp.define('pixbuf', {'buffer',{}})
+-- Comp.define('pixbuf', {'buffer',{}})
+Comp.define('pixlist', {'pix',{},'lastx',0,'lasty',0})
 Comp.define('script', {'script',''})
+
+local function toPixlist(buf)
+  local list = {}
+  for i=1,#buf do
+    if buf[i].type ~= T.Off then
+      buf[i].type = T.Entity
+      list[#list+1] = buf[i]
+    end
+  end
+  return list
+end
 
 local function newWorld(opts)
   local bounds = opts.bounds
@@ -32,14 +44,13 @@ local function newWorld(opts)
   })
 
   local snailBuf = love.filesystem.load('data/snail.lua')()
+  local plist = toPixlist(snailBuf)
   estore:newEntity({
     {'name', {name='Snail'}},
     {'pos',{x=30,y=220}},
     {'bounds',{offx=0,offy=0, w=20, h=20}},
-    {'pixbuf', {buffer=snailBuf}},
+    {'pixlist', {pix=plist, lastx=-5000,lasty=-5000}},
     {'script', {script='crawl'}},
-  -- local snailBuf = love.filesystem.load('data/snail.lua')()
-  -- pixgrid:applyBufferAt(snailBuf, 100,100)
   })
 
   world.estore = estore

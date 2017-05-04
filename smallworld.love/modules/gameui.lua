@@ -172,7 +172,7 @@ M.updateWorld = function(world, action)
       -- Stepwise on/off:
       if action.key == 's' and action.state == "pressed" then
         world.timectrl.stepwise = not world.timectrl.stepwise
-      elseif action.key == 'space' then
+      elseif action.key == 'space' and action.state == "pressed" then
         world.timectrl.stepped = true
       end
 

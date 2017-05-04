@@ -19,32 +19,35 @@ local function clearEntityPixels(pixgrid)
   changer:apply(pixgrid)
 end
 
-local function updatePixgrid(pixgrid, iterations)
-  for i=1, iterations do
+-- System to update the pixgrid
+local pixgridSystem = defineUpdateSystem(hasComps('pixgrid'), function(ge,estore,input,res)
+    local pixgrid = ge.pixgrid.pixgrid
+
+    -- Entities-in-pixgrid update:
     changer:reset()
-    -- Accumulate pixgrid updates:
+    estore:walkEntities(hasComps('pixlist'), function(be)
+      local pixlist = be.pixlist
+      local x,y = getPos(be)
+      x = math.round0(x)
+      y = math.round0(y)
+      if pixlist.lastx == x and pixlist.lasty == y then
+        -- no change, skip
+      else
+        changer:movePixlist(pixlist.pix, pixlist.lastx, pixlist.lasty, x,y)
+        pixlist.lastx = x
+        pixlist.lasty = y
+      end
+    end)
+    changer:apply(pixgrid)
+
+    -- General pixgrid update
+    changer:reset()
     for i=1,#pixgrid.buf do
       local p = pixgrid.buf[i]
       local fn = Updaters[p.type]
       if fn then fn(p,pixgrid,changer) end
     end
-    -- Apply accumulated updates to the pixgrid:
     changer:apply(pixgrid)
-  end
-end
-
--- System to update the pixgrid
-local pixgridSystem = defineUpdateSystem(hasComps('pixgrid'), function(ge,estore,input,res)
-    local pixgrid = ge.pixgrid.pixgrid
-
-    clearEntityPixels(pixgrid)
-
-    estore:walkEntities(hasComps('pixbuf'), function(be)
-      local x,y = getPos(be)
-      pixgrid:applyBufferAt(be.pixbuf.buffer, math.round0(x), math.round0(y))
-    end)
-
-    updatePixgrid(pixgrid, 1)
 
 end)
 
@@ -70,7 +73,6 @@ local function updateWorld(world, action)
   if action.type == "tick" then
     pixgridSystem(world.estore, world.input, world.resources)
     scriptSystem(world.estore, world.input, world.resources)
-    -- pixbufSystem(world.estore, world.input, {})
     world.input = {}
 
   elseif action.type == 'paint' then
