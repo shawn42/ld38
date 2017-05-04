@@ -19,6 +19,13 @@ local function clearEntityPixels(pixgrid)
   changer:apply(pixgrid)
 end
 
+local moverSystem = defineUpdateSystem(
+  hasComps('vel','pos','pixlist'),
+  function(e,estore,input,res)
+    local pixgrid = Helpers.getPixgrid(estore)
+  end
+)
+
 -- System to update the pixgrid
 local pixgridSystem = defineUpdateSystem(hasComps('pixgrid'), function(ge,estore,input,res)
     local pixgrid = ge.pixgrid.pixgrid
@@ -27,15 +34,38 @@ local pixgridSystem = defineUpdateSystem(hasComps('pixgrid'), function(ge,estore
     changer:reset()
     estore:walkEntities(hasComps('pixlist'), function(be)
       local pixlist = be.pixlist
+
       local x,y = getPos(be)
+      x = x + be.vel.dx
+      y = y + be.vel.dy
+
       x = math.round0(x)
       y = math.round0(y)
       if pixlist.lastx == x and pixlist.lasty == y then
-        -- no change, skip
+        -- no pixel-level change, skip
+        be.pos.x = be.pos.x + be.vel.dx
+        be.pos.y = be.pos.y + be.vel.dy
       else
-        changer:movePixlist(pixlist.pix, pixlist.lastx, pixlist.lasty, x,y)
-        pixlist.lastx = x
-        pixlist.lasty = y
+        local bump = false
+        for i=1,#pixlist.pix do
+          local p = pixlist.pix[i]
+          local op = pixgrid:get(p[1]+x,p[2]+y)
+          if op.type == T.NaP or op.type == T.Off or op.type == T.Entity then
+            -- 
+
+          else
+            bump = true
+          end
+        end
+        if not bump then
+          changer:movePixlist(pixlist.pix, pixlist.lastx, pixlist.lasty, x,y)
+          pixlist.lastx = x
+          pixlist.lasty = y
+          be.pos.x = be.pos.x + be.vel.dx
+          be.pos.y = be.pos.y + be.vel.dy
+        else
+          --
+        end
       end
     end)
     changer:apply(pixgrid)
