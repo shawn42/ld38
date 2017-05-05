@@ -26,6 +26,55 @@ local moverSystem = defineUpdateSystem(
   end
 )
 
+local function moveEntityInPixgrid(e, pixgrid, changer)
+  local pixlist = e.pixlist
+  local x,y = getPos(e)
+
+  e.bumper.bumped = false
+
+  local tryx = x + e.vel.dx
+  local tryy = y + e.vel.dy
+
+  -- Figure out next desired grid location:
+  local gridx = math.round0(x + e.vel.dx)
+  local gridy = math.round0(y + e.vel.dy)
+
+  if pixlist.lastx == gridx and pixlist.lasty == gridy then
+    -- no pixel-level change, no pixgrid update needed.
+    -- Just update the virtual location:
+    e.pos.x = tryx
+    e.pos.y = tryy
+  else
+    -- Detect if the proposed move to gridx,gridy would cause any of the pixgrid pixels to collide:
+    local bump = false
+    for i=1,#pixlist.pix do
+      local p = pixlist.pix[i]
+      local op = pixgrid:get(p[1] + gridx, p[2] + gridy)
+      -- FIXME this is jank:
+      if op and (op.type == T.NaP or op.type == T.Off or op.type == T.Entity) then
+        -- no collision
+      else
+        bump = true
+      end
+    end
+    if bump then
+      -- collision
+      e.bumper.bumped = true
+      e.bumper.rightbump = (e.vel.dx > 0)
+      e.bumper.leftbump = (e.vel.dx < 0)
+      e.bumper.bottombump = (e.vel.dy > 0)
+      e.bumper.topbump = (e.vel.dy < 0)
+    else
+      -- no collision
+      changer:movePixlist(pixlist.pix, pixlist.lastx, pixlist.lasty, gridx, gridy)
+      pixlist.lastx = gridx
+      pixlist.lasty = gridy
+      e.pos.x = tryx
+      e.pos.y = tryy
+    end
+  end
+end
+
 -- System to update the pixgrid
 local pixgridSystem = defineUpdateSystem(hasComps('pixgrid'), function(ge,estore,input,res)
     local pixgrid = ge.pixgrid.pixgrid
@@ -33,40 +82,7 @@ local pixgridSystem = defineUpdateSystem(hasComps('pixgrid'), function(ge,estore
     -- Entities-in-pixgrid update:
     changer:reset()
     estore:walkEntities(hasComps('pixlist'), function(be)
-      local pixlist = be.pixlist
-
-      local x,y = getPos(be)
-      x = x + be.vel.dx
-      y = y + be.vel.dy
-
-      x = math.round0(x)
-      y = math.round0(y)
-      if pixlist.lastx == x and pixlist.lasty == y then
-        -- no pixel-level change, skip
-        be.pos.x = be.pos.x + be.vel.dx
-        be.pos.y = be.pos.y + be.vel.dy
-      else
-        local bump = false
-        for i=1,#pixlist.pix do
-          local p = pixlist.pix[i]
-          local op = pixgrid:get(p[1]+x,p[2]+y)
-          if op.type == T.NaP or op.type == T.Off or op.type == T.Entity then
-            -- 
-
-          else
-            bump = true
-          end
-        end
-        if not bump then
-          changer:movePixlist(pixlist.pix, pixlist.lastx, pixlist.lasty, x,y)
-          pixlist.lastx = x
-          pixlist.lasty = y
-          be.pos.x = be.pos.x + be.vel.dx
-          be.pos.y = be.pos.y + be.vel.dy
-        else
-          --
-        end
-      end
+      moveEntityInPixgrid(be, pixgrid, changer)
     end)
     changer:apply(pixgrid)
 
