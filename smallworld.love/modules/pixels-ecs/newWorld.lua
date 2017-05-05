@@ -11,7 +11,7 @@ local Comp = require 'ecs/component'
 Comp.define('pixgrid', {'pixgrid',{}})
 Comp.define('pixlist', {'pix',{},'lastx',0,'lasty',0})
 Comp.define('script', {'script',''})
-Comp.define('bumper', {'bumped',false,'bumpleft',false,'bumpright',false,'bumptop',false,'bumpbottom',false})
+Comp.define('bumper', {'bumped',false,'left',false,'right',false,'top',false,'bottom',false})
 
 local function toPixlist(buf)
   local list = {}
@@ -47,7 +47,7 @@ local function newWorld(opts)
   local plist = toPixlist(snailBuf)
   estore:newEntity({
     {'name', {name='Snail'}},
-    {'pos',{x=30,y=220}},
+    {'pos',{x=30,y=120}},
     {'vel',{}},
     {'bounds',{offx=0,offy=0, w=20, h=20}},
     {'pixlist', {pix=plist, lastx=-5000,lasty=-5000}},

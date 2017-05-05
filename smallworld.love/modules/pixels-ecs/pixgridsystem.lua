@@ -10,6 +10,10 @@ local function moveEntityInPixgrid(e, pixgrid, changer)
   local x,y = getPos(e)
 
   e.bumper.bumped = false
+  e.bumper.left = false
+  e.bumper.right = false
+  e.bumper.top = false
+  e.bumper.bottom = false
 
   local tryx = x + e.vel.dx
   local tryy = y + e.vel.dy
@@ -39,10 +43,10 @@ local function moveEntityInPixgrid(e, pixgrid, changer)
     if bump then
       -- collision
       e.bumper.bumped = true
-      e.bumper.rightbump = (e.vel.dx > 0)
-      e.bumper.leftbump = (e.vel.dx < 0)
-      e.bumper.bottombump = (e.vel.dy > 0)
-      e.bumper.topbump = (e.vel.dy < 0)
+      e.bumper.right = (e.vel.dx > 0)
+      e.bumper.left = (e.vel.dx < 0)
+      e.bumper.bottom = (e.vel.dy > 0)
+      e.bumper.top = (e.vel.dy < 0)
     else
       -- no collision
       changer:movePixlist(pixlist.pix, pixlist.lastx, pixlist.lasty, gridx, gridy)
