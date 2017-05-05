@@ -7,7 +7,7 @@ S.crawl = function(e,estore,input,res)
 
   elseif e.bumper.bumped then
     e.vel.dx = e.vel.dx * -1
-    print("crawl: bumped! dx="..e.vel.dx)
+    -- print("crawl: bumped! dx="..e.vel.dx)
   end
 end
 

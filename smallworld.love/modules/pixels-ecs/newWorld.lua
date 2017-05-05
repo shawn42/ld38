@@ -75,7 +75,6 @@ local function addSandDunes(pixgrid, freq, amp, topEdge)
 end
 
 function buildPixgrid(w,h,scale)
-  print(w,h,scale)
   local pixgrid = Pixgrid.Pixgrid:new({
     w = w/scale,
     h = h/scale,
@@ -83,9 +82,6 @@ function buildPixgrid(w,h,scale)
   })
 
   addSandDunes(pixgrid, 15, 12)
-
-  -- local snailBuf = love.filesystem.load('data/snail.lua')()
-  -- pixgrid:applyBufferAt(snailBuf, 100,100)
 
   return pixgrid
 end
