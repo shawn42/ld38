@@ -47,7 +47,7 @@ local function newWorld(opts)
   local plist = toPixlist(snailBuf)
   estore:newEntity({
     {'name', {name='Snail'}},
-    {'pos',{x=30,y=120}},
+    {'pos',{x=30,y=220}},
     {'vel',{}},
     {'bounds',{offx=0,offy=0, w=20, h=20}},
     {'pixlist', {pix=plist, lastx=-5000,lasty=-5000}},
