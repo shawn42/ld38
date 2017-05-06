@@ -20,6 +20,7 @@ S.crawl = function(e,estore,input,res)
       if e.bumper.top then
         -- blocked to the upper-right, reverse direction
         e.vel.dx = -speed
+        e.pixlist.hdir = -1 -- face left
       else
         -- "jump"
         e.vel.dy = -0.5
@@ -30,6 +31,7 @@ S.crawl = function(e,estore,input,res)
       if e.bumper.top then
         -- blocked to the upper-left, reverse direction
         e.vel.dx = speed
+        e.pixlist.hdir = 1 -- face right
       else
         -- "jump"
         e.vel.dy = -0.5

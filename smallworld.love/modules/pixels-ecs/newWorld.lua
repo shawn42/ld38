@@ -9,10 +9,12 @@ require 'comps'
 
 local Comp = require 'ecs/component'
 Comp.define('pixgrid', {'pixgrid',{}})
-Comp.define('pixlist', {'pix',{},'lastx',0,'lasty',0})
+Comp.define('pixlist', {'pix',{},'lastx',0,'lasty',0,'hdir',1,'lasthdir',1})
 Comp.define('script', {'script',''})
 Comp.define('bumper', {'bumped',false,'left',false,'right',false,'top',false,'bottom',false})
 
+-- Converts a pixgrid buffer into a list of pix,
+-- by omitting T.Off pix and setting type to T.Entity
 local function toPixlist(buf)
   local list = {}
   for i=1,#buf do

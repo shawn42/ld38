@@ -121,6 +121,12 @@ function Changer:setPixlist(list, xOffset, yOffset)
   end
 end
 
+function Changer:clearPixlist(list, xOffset, yOffset)
+  for i=1,#list do
+    table.insert(self.clears, {list[i][1]+xOffset, list[i][2]+yOffset})
+  end
+end
+
 function Changer:movePixlist(list, lastx, lasty, xOffset, yOffset)
   for i=1,#list do
     local p = list[i]

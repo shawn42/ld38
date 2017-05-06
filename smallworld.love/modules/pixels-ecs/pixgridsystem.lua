@@ -80,7 +80,32 @@ local function tryMoveY(e,pixgrid,changer)
   end
 end
 
+local function flipPixlistX(pixlist,changer)
+  local max = -1000
+  local min = 1000
+  local pix = pixlist.pix
+  for i=1,#pix do
+    max = math.max(max,pix[i][1])
+    min = math.min(min,pix[i][1])
+  end
+  local newpix = {}
+  for i=1,#pix do
+    local newx = max - pix[i][1] - min -- reflect loc of each pix about its h center
+    table.insert(newpix, {newx,pix[i][2], pix[i][3], pix[i][4], pix[i][5], pix[i].type, pix[i].data})
+  end
+  pixlist.pix = newpix
+  changer:clearPixlist(pix,pixlist.lastx,pixlist.lasty)
+  changer:setPixlist(newpix,pixlist.lastx,pixlist.lasty)
+end
+
 local function moveEntityInPixgrid(e, pixgrid, changer)
+  if e.pixlist.hdir ~= e.pixlist.lasthdir then
+    changer:reset()
+    flipPixlistX(e.pixlist,changer)
+    changer:apply(pixgrid)
+    e.pixlist.lasthdir = e.pixlist.hdir
+  end
+
   e.bumper.bumped = false
   e.bumper.left = false
   e.bumper.right = false
@@ -93,6 +118,7 @@ local function moveEntityInPixgrid(e, pixgrid, changer)
   if e.vel.dx ~= 0 then
     tryMoveX(e,pixgrid,changer)
   end
+
 end
 
 local changer = Pixgrid.Changer:new()
