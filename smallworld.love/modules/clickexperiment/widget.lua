@@ -13,18 +13,24 @@ local function updateWorld(world,action)
   if action.type == 'widgetClicked' then
     print(world.label.." CLICKED:")
     print(tdebug(action.action))
+
   elseif action.type == 'widgetReleased' then
     print(world.label.." RELEASED.")
+
   elseif action.type == 'widgetMove' then
     print(world.label.." MOVE: "..tflatten(action.action))
   end
   return world
 end
 
-local function getStructure(tag,world)
+-- onmouse* below are tables to be used as templates for actions that
+-- will get delivered to updateWorld() in this module.
+-- Such delivered actions will have an 'action' field set to the current mouse action.
+-- Note: 'wrap' is given to us by a containing module to provide its own wrapping; don't mess with that guy.
+local function getStructure(wrap,world)
   return {
     bounds=world.bounds,
-    tag=tag,
+    wrap=wrap,
     onmousepressed={type='widgetClicked'},
     onmousereleased={type='widgetReleased'},
     onmousemoved={type='widgetMove'},

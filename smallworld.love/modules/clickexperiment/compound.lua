@@ -32,6 +32,7 @@ local function newWorld(opts)
 end
 
 local function updateWorld(world,action)
+  -- Note these action types are defined by the tags/onmouse* wrappers we specifide in getStructure()
   if action.type == 'widget' then
     Widget.updateWorld(world.widgets[action.idx],action.action)
   elseif action.type == 'inTheOpen' then
@@ -40,15 +41,25 @@ local function updateWorld(world,action)
   return world
 end
 
--- bounds,tag,children, [onmousepressed ... ]
-local function getStructure(tag,world)
+-- The children list below is a list of box structures based on world.widgets.
+-- Each is built by invoking Widget.getStructure with a 'wrap' structure
+-- including a 'type' which our updateWorld() function will dispatch on,
+-- AND ALSO the 'idx' field, set to the proper widget index so we know where to deliver the unwrapped event.
+--
+-- onmouse* below are tables to be used as templates for actions that
+-- will get delivered to updateWorld() in this module.
+-- Such delivered actions will have an 'action' field set to the current mouse action.
+-- THIS MODULE WILL ONLY HANDLE MOUSE ACTIONS THAT AREN'T AIMED AT THE CHILDREN.
+--
+-- Note: 'wrap' is given to us by a containing module to provide its own wrapping; don't mess with that guy.
+local function getStructure(wrap,world)
   local children={}
   for i=1,#world.widgets do
     table.insert(children, Widget.getStructure({type='widget',idx=i}, world.widgets[i]))
   end
   return {
     bounds=world.bounds,
-    tag=tag,
+    wrap=wrap,
     onmousepressed={type='inTheOpen'},
     -- onmousemoved={type='inTheOpen'},
     onmousereleased={type='inTheOpen'},
