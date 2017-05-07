@@ -5,7 +5,8 @@ local HEIGHT = 600
 local SCALE = 2
 local ITERATIONS = 1
 
-local RootModule = require 'modules/gameui'
+-- local RootModule = require 'modules/gameui'
+local RootModule = require 'modules/clickexperiment'
 
 -- Reference to the root module state
 local world
